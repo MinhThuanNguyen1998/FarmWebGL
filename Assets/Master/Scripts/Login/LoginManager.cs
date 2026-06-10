@@ -30,7 +30,7 @@ public class LoginManager : MonoBehaviour
         if(result.IsSuccess)
         {
             m_SignalBus.Fire(new LoginSuccessSignal());
-            m_SceneLoader.LoadTargetScene(Config.Main_Scene);
+            m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
         }
         else
         {

@@ -11,7 +11,7 @@ public class SceneLoader
 
     [Inject] private readonly LoadingBar m_LoadingBar;
 
-    public async void LoadTargetScene(string sceneName)
+    public async void LoadSceneWithLoadingBar(string sceneName)
     {
         m_LoadingBar.Show();
         m_LoadingBar.SetProgress(0f);
@@ -22,7 +22,15 @@ public class SceneLoader
 
         m_LoadingBar.Hide();
     }
+    public async UniTask LoadSceneWithoutLoadingBar(string sceneName)
+    {
+        if (m_LoadingBar != null)
+        {
+            m_LoadingBar.ForceHide();
+        }
 
+        await SceneManager.LoadSceneAsync(sceneName);
+    }
     private async UniTask LoadSceneAsync(string sceneName, float startTime)
     {
         var operation = SceneManager.LoadSceneAsync(sceneName);

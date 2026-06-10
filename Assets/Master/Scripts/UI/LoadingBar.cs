@@ -31,6 +31,12 @@ public class LoadingBar : MonoBehaviour
             m_ImageComp.fillAmount = 0f;
         });
     }
+    public void ForceHide()
+    {
+        m_CanvasGroup.DOKill();
+        m_CanvasGroup.alpha = 0f;
+        m_ImageComp.fillAmount = 0f;
+    }
 
     private void OnDestroy()
     {
