@@ -8,10 +8,8 @@ public class LoadingBar : MonoBehaviour
 {
     [SerializeField] private CanvasGroup m_CanvasGroup;
     [SerializeField] private Image m_ImageComp;
-
     private Tween m_ProgressTween;
 
-   
     public void Show()
     {
         m_ImageComp.fillAmount = 0f;

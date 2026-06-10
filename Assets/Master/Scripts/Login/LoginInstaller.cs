@@ -13,8 +13,5 @@ public class LoginInstaller : MonoInstaller
         Container.DeclareSignal<LoginSuccessSignal>();
         Container.DeclareSignal<LoginFailedSignal>();
 
-       
-        //Container.Bind<AuthService>().AsSingle().NonLazy();
-        //Container.Bind<SceneLoader>().AsSingle().NonLazy();
     }
 }

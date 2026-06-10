@@ -6,15 +6,45 @@ using UnityEngine.SceneManagement;
 using Zenject;
 public class SceneLoader
 {
+
+    private const float MinLoadingTime = 1.5f;
+
     [Inject] private readonly LoadingBar m_LoadingBar;
 
     public async void LoadTargetScene(string sceneName)
     {
-        await LoadSceneAsync(sceneName);
+        m_LoadingBar.Show();
+        m_LoadingBar.SetProgress(0f);
 
+        float startTime = Time.time;
+
+        await LoadSceneAsync(sceneName, startTime);
+
+        m_LoadingBar.Hide();
     }
-    private async UniTask LoadSceneAsync(string sceneName)
+
+    private async UniTask LoadSceneAsync(string sceneName, float startTime)
     {
-        await SceneManager.LoadSceneAsync(sceneName).ToUniTask();
+        var operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = false;
+
+        // Wait until the scene is 90% loaded or the minimum time has elapsed
+        while (operation.progress < 0.9f || (Time.time - startTime) < MinLoadingTime)
+        {
+            // Calculate progress based on load status and elapsed time
+            float loadProgress = Mathf.Clamp01(operation.progress / 0.9f);
+            float timeProgress = Mathf.Clamp01((Time.time - startTime) / MinLoadingTime);
+
+            // Sync the loading bar with the minimum of both values for smoothness
+            m_LoadingBar.SetProgress(Mathf.Min(loadProgress, timeProgress));
+
+            await UniTask.Yield();
+        }
+
+        // Ensure the bar reaches 100% and wait a brief moment for visual clarity
+        m_LoadingBar.SetProgress(1f);
+        await UniTask.Delay(300);
+
+        operation.allowSceneActivation = true;
     }
 }
