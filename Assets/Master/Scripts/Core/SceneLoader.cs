@@ -11,7 +11,7 @@ public class SceneLoader
 
     [Inject] private readonly LoadingBar m_LoadingBar;
 
-    public async void LoadSceneWithLoadingBar(string sceneName)
+    public async UniTask LoadSceneWithLoadingBar(string sceneName)
     {
         m_LoadingBar.Show();
         m_LoadingBar.SetProgress(0f);

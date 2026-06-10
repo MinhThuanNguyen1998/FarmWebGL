@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,13 +13,13 @@ public class BootstrapManager : MonoBehaviour
         if (TokenManager.HasToken())
         {
             Debug.Log("Token found in PlayerPrefs. Redirecting to Main scene.");
-            m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
+            await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
         }
         else
         {
            
             Debug.Log("No token found. Redirecting to Login scene.");
-            m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene);
+            await m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene);
         }
     }
 }

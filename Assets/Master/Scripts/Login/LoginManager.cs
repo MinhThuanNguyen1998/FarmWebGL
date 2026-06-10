@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -30,7 +31,7 @@ public class LoginManager : MonoBehaviour
         if(result.IsSuccess)
         {
             m_SignalBus.Fire(new LoginSuccessSignal());
-            m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
+            await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
         }
         else
         {
