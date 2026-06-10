@@ -4,6 +4,7 @@ using UnityEngine;
 using Zenject;
 public class LoginInstaller : MonoInstaller
 {
+    
     public override void InstallBindings()
     {
         SignalBusInstaller.Install(Container);
@@ -12,6 +13,8 @@ public class LoginInstaller : MonoInstaller
         Container.DeclareSignal<LoginSuccessSignal>();
         Container.DeclareSignal<LoginFailedSignal>();
 
-        Container.Bind<AuthService>().AsSingle().NonLazy();
+       
+        //Container.Bind<AuthService>().AsSingle().NonLazy();
+        //Container.Bind<SceneLoader>().AsSingle().NonLazy();
     }
 }

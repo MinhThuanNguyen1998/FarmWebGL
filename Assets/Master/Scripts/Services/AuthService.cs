@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using Cysharp.Threading.Tasks;
 public class AuthService 
 {
     private const string API_LOGIN_URL = "https://dummyjson.com/auth/login";
@@ -26,7 +24,7 @@ public class AuthService
         public string refreshToken;
     }
 
-    public async Task<AuthResult> LoginAsync(string username, string password)
+    public async UniTask<AuthResult> LoginAsync(string username, string password)
     {
         try
         {
@@ -43,11 +41,7 @@ public class AuthService
                 request.SetRequestHeader("Content-Type", "application/json");
 
                 // 3. Send request and await response
-                var operation = request.SendWebRequest();
-                var tcs = new TaskCompletionSource<bool>();
-                operation.completed += _ => tcs.SetResult(true);
-                // Await the completion of the request
-                await tcs.Task;
+                await request.SendWebRequest().ToUniTask();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     string jsonResponse = request.downloadHandler.text;
