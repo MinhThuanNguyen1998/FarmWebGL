@@ -36,20 +36,20 @@ public class SceneLoader
         var operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
 
-        // Wait until the scene is 90% loaded or the minimum time has elapsed
+        // Wait until the scene is 90% loaded
         while (operation.progress < 0.9f || (Time.time - startTime) < MinLoadingTime)
         {
             // Calculate progress based on load status and elapsed time
             float loadProgress = Mathf.Clamp01(operation.progress / 0.9f);
             float timeProgress = Mathf.Clamp01((Time.time - startTime) / MinLoadingTime);
 
-            // Sync the loading bar with the minimum of both values for smoothness
+            // Sync the loading bar
             m_LoadingBar.SetProgress(Mathf.Min(loadProgress, timeProgress));
 
             await UniTask.Yield();
         }
 
-        // Ensure the bar reaches 100% and wait a brief moment for visual clarity
+        // Ensure the bar reaches 100%
         m_LoadingBar.SetProgress(1f);
         await UniTask.Delay(300);
 
