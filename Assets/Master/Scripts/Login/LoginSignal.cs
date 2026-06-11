@@ -15,3 +15,5 @@ public struct LoginRequestSignal
 }
 public struct LoginSuccessSignal { }
 public struct LoginFailedSignal { }
+
+public struct LoginDataErrorSignal { }

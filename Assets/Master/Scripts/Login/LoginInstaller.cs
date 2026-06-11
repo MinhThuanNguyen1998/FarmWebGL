@@ -12,6 +12,7 @@ public class LoginInstaller : MonoInstaller
         Container.DeclareSignal<LoginRequestSignal>();
         Container.DeclareSignal<LoginSuccessSignal>();
         Container.DeclareSignal<LoginFailedSignal>();
+        Container.DeclareSignal<LoginDataErrorSignal>();
 
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 public class AuthService 
 {
-    private const string API_LOGIN_URL = "https://dummyjson.com/auth/login";
     [Serializable]
     private class LoginRequest
     {
@@ -33,7 +32,7 @@ public class AuthService
             string jsonBody = JsonUtility.ToJson(loginRequest);
 
             // 2. Create UnityWebRequest
-            using (UnityWebRequest request = new UnityWebRequest(API_LOGIN_URL, "POST"))
+            using (UnityWebRequest request = new UnityWebRequest(ApiConfig.API_AUTH_URL, "POST"))
             {
                 byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonBody); // convert json string to byte array
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);// set download handler to receive response

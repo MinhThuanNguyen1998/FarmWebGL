@@ -22,12 +22,14 @@ public class LoginUI : MonoBehaviour
         m_LoginButton.onClick.AddListener(OnLoginButtonClicked);
         m_SignalBus.Subscribe<LoginSuccessSignal>(OnLoginSuccess); // Listen from LoginManager
         m_SignalBus.Subscribe<LoginFailedSignal>(OnLoginFailed); // Listen from LoginManager
+        m_SignalBus.Subscribe<LoginDataErrorSignal>(OnLoginDataError); // Listen from LoginManager
     }
     private void OnDisable()
     {
         m_LoginButton.onClick.RemoveListener(OnLoginButtonClicked);
         m_SignalBus.TryUnsubscribe<LoginSuccessSignal>(OnLoginSuccess); // Lister from LoginManager
         m_SignalBus.TryUnsubscribe<LoginFailedSignal>(OnLoginFailed); // Lister from LoginManager
+        m_SignalBus.TryUnsubscribe<LoginDataErrorSignal>(OnLoginDataError); // Lister from LoginManager
     }
     private void OnLoginButtonClicked()
     {
@@ -55,6 +57,11 @@ public class LoginUI : MonoBehaviour
         SetUIState(true);
         m_StatusText.text = Config.LoginFailed;
         m_PasswordInputField.text = string.Empty;
+    }
+    private void OnLoginDataError()
+    {
+        SetUIState(true);
+        m_StatusText.text = Config.DataLoadError;
     }
 
     private void SetUIState(bool isInteractable)
