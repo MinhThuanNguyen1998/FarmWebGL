@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -32,6 +32,8 @@ public class BootstrapManager : MonoBehaviour
             else
             {
                 Debug.LogError("Failed to load user data");
+                TokenManager.ClearTokens();
+                await m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene);
             }
         }
         else
