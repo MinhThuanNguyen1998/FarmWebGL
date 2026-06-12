@@ -31,18 +31,18 @@ public class LoginManager : MonoBehaviour
             bool dataLoaded = await m_UserDataService.LoadAllDataAsync();
             if (dataLoaded)
             {
-                m_SignalBus.Fire(new LoginSuccessSignal());
+                m_SignalBus.Fire(new LoginSuccessSignal()); // Fire a signal to LoginUI
                 await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
             }
             else
             {
                 TokenManager.ClearTokens();
-                m_SignalBus.Fire(new LoginDataErrorSignal());
+                m_SignalBus.Fire(new LoginDataErrorSignal()); // Fire a signal to LoginUI
             }
         }
         else
         {
-            m_SignalBus.Fire(new LoginFailedSignal());
+            m_SignalBus.Fire(new LoginFailedSignal()); // Fire a signal to LoginUI
         }
 
     }

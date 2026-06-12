@@ -1,13 +1,23 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.Networking;
+using Zenject;
+
 
 public class UserDataService
 {
+    public UserData Data { get; private set; } = null;
+    public bool IsLoaded { get; private set; } = false;
+
+    private readonly SignalBus m_SignalBus;
+
+    [Inject]
+    public UserDataService(SignalBus signalBus)
+    {
+        m_SignalBus = signalBus;
+    }
+
     public async UniTask<bool> LoadAllDataAsync()
     {
         string url = ApiConfig.API_DATA_URL;
@@ -22,9 +32,10 @@ public class UserDataService
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     string jsonResponse = request.downloadHandler.text;
-                    UserData data = JsonUtility.FromJson<UserData>(jsonResponse);
-                    //Debug.Log("Money: " + data.money);
-                    Debug.Log($"Raw JSON response: {jsonResponse}");
+                    Data = JsonUtility.FromJson<UserData>(jsonResponse);
+                    //Debug.Log($"Raw JSON response: {jsonResponse}");
+                    IsLoaded = true;
+                    m_SignalBus.Fire(new UserDataLoadedSignal(Data));
                     return true;
                 }
                 else
@@ -39,5 +50,10 @@ public class UserDataService
             Debug.LogError($"Error loading user data: {ex.Message}");
             return false;
         }
+    }
+    public void ResetData()
+    {
+        IsLoaded = false;
+        Data = null;
     }
 }
