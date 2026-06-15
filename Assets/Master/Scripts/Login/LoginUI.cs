@@ -60,6 +60,7 @@ public class LoginUI : MonoBehaviour
     }
     private void OnLoginDataError()
     {
+        Debug.Log("Login data error!");
         SetUIState(true);
         m_StatusText.text = Config.DataLoadError;
     }
