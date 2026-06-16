@@ -10,13 +10,7 @@ public class UserDataService
     public UserData Data { get; private set; } = null;
     public bool IsLoaded { get; private set; } = false;
 
-    private readonly SignalBus m_SignalBus;
-
-    [Inject]
-    public UserDataService(SignalBus signalBus)
-    {
-        m_SignalBus = signalBus;
-    }
+    [Inject] private readonly SignalBus m_SignalBus;
 
     public async UniTask<bool> LoadAllDataAsync()
     {

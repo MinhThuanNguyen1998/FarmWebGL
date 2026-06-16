@@ -7,7 +7,7 @@ public class LoginInstaller : MonoInstaller
     
     public override void InstallBindings()
     {
-        SignalBusInstaller.Install(Container);
+        //SignalBusInstaller.Install(Container);
         // Declare signals
         Container.DeclareSignal<LoginRequestSignal>();
         Container.DeclareSignal<LoginSuccessSignal>();

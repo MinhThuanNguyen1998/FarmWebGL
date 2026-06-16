@@ -7,9 +7,14 @@ public class BootstrapInstaller : MonoInstaller
     [SerializeField] private LoadingBar m_LoadingBar;
     public override void InstallBindings()
     {
+        SignalBusInstaller.Install(Container);
+
         Container.Bind<LoadingBar>().FromInstance(m_LoadingBar).AsSingle().NonLazy();
         Container.Bind<AuthService>().AsSingle().NonLazy();
         Container.Bind<SceneLoader>().AsSingle().NonLazy();
         Container.Bind<UserDataService>().AsSingle().NonLazy();
+
+        // Signals
+        Container.DeclareSignal <UserDataLoadedSignal>();
     }
 }
