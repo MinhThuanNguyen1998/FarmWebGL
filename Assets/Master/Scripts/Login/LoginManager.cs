@@ -24,26 +24,39 @@ public class LoginManager : MonoBehaviour
     private void HandleLoginRequest(LoginRequestSignal signal) => ProgressLoginRequest(signal).Forget(); // foret the async method since we don't need to await it here.
     private async UniTaskVoid ProgressLoginRequest(LoginRequestSignal signal)
     {
-        var authResult = await m_AuthService.LoginAsync(signal.UserName, signal.Password);
-
-        if (authResult.IsSuccess)
+        try
         {
-            bool dataLoaded = await m_UserDataService.LoadAllDataAsync();
-            if (dataLoaded)
+            var authResult = await m_AuthService.LoginAsync(signal.UserName, signal.Password);
+
+            if (!authResult.IsSuccess)
             {
-                m_SignalBus.Fire(new LoginSuccessSignal()); // Fire a signal to LoginUI
+                m_SignalBus.Fire(new LoginFailedSignal());
+                return; 
+            }
+
+            LoadDataResult dataResult = await m_UserDataService.LoadAllDataAsync();
+
+            if (dataResult == LoadDataResult.Success)
+            {
+                m_SignalBus.Fire(new LoginSuccessSignal());
                 await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
             }
             else
             {
-                TokenManager.ClearTokens();
-                m_SignalBus.Fire(new LoginDataErrorSignal()); // Fire a signal to LoginUI
+                if (dataResult == LoadDataResult.Unauthorized)
+                {
+                    TokenManager.ClearTokens();
+                }
+
+                m_SignalBus.Fire(new LoginDataErrorSignal());
             }
         }
-        else
+        catch (Exception ex)
         {
-            m_SignalBus.Fire(new LoginFailedSignal()); // Fire a signal to LoginUI
+            Debug.LogError($"[LoginManager] Critical error during login process: {ex.Message}");
+            m_SignalBus.Fire(new LoginFailedSignal());
         }
-
     }
+
+
 }

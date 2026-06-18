@@ -12,7 +12,7 @@ public class UserDataService
 
     [Inject] private readonly SignalBus m_SignalBus;
 
-    public async UniTask<bool> LoadAllDataAsync()
+    public async UniTask<LoadDataResult> LoadAllDataAsync()
     {
         string url = ApiConfig.API_DATA_URL;
         string token = TokenManager.GetAccessToken();
@@ -30,19 +30,23 @@ public class UserDataService
                     //Debug.Log($"Raw JSON response: {jsonResponse}");
                     IsLoaded = true;
                     m_SignalBus.Fire(new UserDataLoadedSignal(Data));
-                    return true;
+                    return LoadDataResult.Success;
                 }
-                else
+                if (request.responseCode == 401) // Token expired or unauthorized
                 {
-                    Debug.LogError($"API Error: {request.error}");
-                    return false;
+                    Debug.LogWarning("Token expired (401 Unauthorized).");
+                    return LoadDataResult.Unauthorized;
                 }
+
+                // Other errors
+                Debug.LogError($"API Network Error: {request.error} (Code: {request.responseCode})");
+                return LoadDataResult.FetchError;
             }
         }
         catch (Exception ex)
         {
             Debug.LogError($"Error loading user data: {ex.Message}");
-            return false;
+            return LoadDataResult.FetchError;
         }
     }
     public void ResetData()
