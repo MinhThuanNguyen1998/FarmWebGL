@@ -7,12 +7,26 @@ using Zenject;
 
 public class UIShopPet : UIShopBase
 {
+    [Header("Dynamic UI Setup")]
+    [SerializeField] private UIItem m_PrefabElement;
+    [SerializeField] private Transform m_ContentContainer;
     protected override void UpdateUI(UserData data)
     {
-        if (data == null) return;
+        if (data == null || data.pet == null || data.pet.items == null) return;
 
-        m_CachedItemCounts.Clear();
-        AddItemDataToDict(data.pet?.items, m_CachedItemCounts);
-        RefreshUIElements();
+        foreach (Transform child in m_ContentContainer)
+        {
+            Destroy(child.gameObject);
+        }
+        m_UIItem.Clear(); 
+
+        foreach (var itemData in data.pet.items)
+        {
+            if (itemData == null) continue;
+            UIItem newElement = Instantiate(m_PrefabElement, m_ContentContainer);
+            newElement.InitAndSetup(itemData);
+            m_UIItem.Add(newElement);
+        }
+
     }
 }

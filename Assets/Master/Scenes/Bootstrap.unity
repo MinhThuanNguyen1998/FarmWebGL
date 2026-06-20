@@ -438,7 +438,7 @@ MonoBehaviour:
   m_SFXSource: {fileID: 1569327586}
   m_SoundsList:
   - type: 101
-    clip: {fileID: 8300000, guid: 7c7190788b5017346928634ca537b275, type: 3}
+    clip: {fileID: 8300000, guid: a61b97f2dc9ce674b9425d055adebd2c, type: 3}
 --- !u!4 &1108529689
 Transform:
   m_ObjectHideFlags: 0

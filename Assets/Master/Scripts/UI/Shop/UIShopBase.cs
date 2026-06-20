@@ -7,7 +7,7 @@ using Zenject;
 public abstract class UIShopBase : MonoBehaviour
 {
     [Header("UI Elements Setup")]
-    [SerializeField] protected List<UIItemQuantityElement> m_UiElements;
+    protected List<UIItem> m_UIItem = new List<UIItem>();
 
     protected SignalBus m_SignalBus;
     protected UserDataService m_UserDataService;
@@ -19,11 +19,10 @@ public abstract class UIShopBase : MonoBehaviour
         m_SignalBus = signalBus;
         m_UserDataService = userDataService;
     }
-
     protected virtual void OnEnable()
     {
         m_SignalBus.Subscribe<UserDataLoadedSignal>(OnUserDataLoaded);
-        if (m_UserDataService.IsLoaded && m_UserDataService.Data != null)
+        if (m_UserDataService.IsLoaded)
         {
             UpdateUI(m_UserDataService.Data);
         }
@@ -41,23 +40,5 @@ public abstract class UIShopBase : MonoBehaviour
 
     protected abstract void UpdateUI(UserData data);
 
-    protected void AddItemDataToDict(List<ItemData> items, Dictionary<string, int> dict)
-    {
-        if (items == null) return;
-        foreach (var item in items)
-        {
-            if (!string.IsNullOrEmpty(item.itemId))
-                dict[item.itemId] = item.count; // Add itemId and count to the dictionary { itemId = "chicken", count = 1 }
-        }
-    }
-
-    protected void RefreshUIElements()
-    {
-        if (m_UiElements == null) return;
-        foreach (var uiElement in m_UiElements.Where(ui => ui != null))
-        {
-            m_CachedItemCounts.TryGetValue(uiElement.ItemId, out int count);
-            uiElement.UpdateCount(count);
-        }
-    }
+   
 }

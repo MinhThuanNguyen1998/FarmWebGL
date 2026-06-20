@@ -167,7 +167,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd802c7e3873a654199ef3bca5627cdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ItemId: chicken
+  m_AvatarImage: {fileID: 7673547032320527133}
+  m_NameText: {fileID: 9146375091833275745}
   m_CountText: {fileID: 3795481468793525822}
 --- !u!1 &7185147356622844094
 GameObject:
@@ -181,7 +182,7 @@ GameObject:
   - component: {fileID: 6205993987640350300}
   - component: {fileID: 9146375091833275745}
   m_Layer: 5
-  m_Name: Text_Item
+  m_Name: Text_NameItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
