@@ -19,6 +19,10 @@ public class AuthService
     [System.Serializable]
     public class TokenResponse
     {
+        public string status;
+        public string message;
+        public string username;
+        public string password;
         public string accessToken;
         public string refreshToken;
     }
