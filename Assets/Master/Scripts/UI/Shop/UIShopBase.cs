@@ -47,7 +47,7 @@ public abstract class UIShopBase : MonoBehaviour
         foreach (var item in items)
         {
             if (!string.IsNullOrEmpty(item.itemId))
-                dict[item.itemId] = item.count;
+                dict[item.itemId] = item.count; // Add itemId and count to the dictionary { itemId = "chicken", count = 1 }
         }
     }
 
