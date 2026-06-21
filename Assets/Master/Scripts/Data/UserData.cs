@@ -24,6 +24,5 @@ public class ItemContainer
 public class ItemData
 {
     public string name;
-    public string avatar;
     public int count;
 }

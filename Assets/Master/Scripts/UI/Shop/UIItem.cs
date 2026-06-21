@@ -25,9 +25,9 @@ public class UIItem : MonoBehaviour
         m_NameText?.SetText(ItemName);
         m_CountText?.SetText(itemData.count.ToString());
 
-        if (m_AvatarImage != null && !string.IsNullOrEmpty(itemData.avatar))
+        if (m_AvatarImage != null && !string.IsNullOrEmpty(ItemName))
         {
-            Sprite loadedSprite = Resources.Load<Sprite>($"Avatar/{itemData.avatar}");
+            Sprite loadedSprite = Resources.Load<Sprite>($"Avatar/{ItemName}");
             if (loadedSprite != null) m_AvatarImage.sprite = loadedSprite;
         }
     }
