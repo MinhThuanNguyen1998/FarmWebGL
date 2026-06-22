@@ -1,31 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class UIShopPet : UIShopBase<UIPetItem>
+using Zenject;
+public class UIShopPet : UIShopBase<UIPetItem, UIPetItem.Pool>
 {
-    [Header("Dynamic UI Setup")]
-    [SerializeField] private UIPetItem m_PrefabElement; 
+   
     [SerializeField] private Transform m_ContentContainer; 
 
     protected override void UpdateUI(UserData data)
     {
-       
-        if (data == null || data.petStorage == null || data.petStorage.animalGroups == null) return;
 
-        foreach (Transform child in m_ContentContainer)
-        {
-            Destroy(child.gameObject); 
-        }
-        m_UIItem.Clear();
+        DespawnAll();
+
+        if (data?.petStorage?.animalGroups == null) return;
 
         foreach (var groupData in data.petStorage.animalGroups)
         {
             if (groupData == null) continue;
 
-            UIPetItem newElement = Instantiate(m_PrefabElement, m_ContentContainer);
-            newElement.InitAndSetup(groupData); 
-            m_UIItem.Add(newElement); 
+            UIPetItem item = m_Pool.Spawn();
+            item.transform.SetParent(m_ContentContainer, false);
+            item.InitAndSetup(groupData);
+            m_ActiveItems.Add(item);
         }
     }
+    protected override void DespawnItem(UIPetItem item) => m_Pool.Despawn(item);
 }

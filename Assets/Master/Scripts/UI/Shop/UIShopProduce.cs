@@ -5,28 +5,26 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 
-public class UIShopProduce : UIShopBase<UIProduceItem>
+public class UIShopProduce : UIShopBase<UIProduceItem, UIProduceItem.Pool>
 {
-    [Header("Dynamic UI Setup")]
-    [SerializeField] private UIProduceItem m_PrefabElement;
     [SerializeField] private Transform m_ContentContainer;
+
     protected override void UpdateUI(UserData data)
     {
-        if (data == null || data.petStorage == null || data.petStorage.generalProduces == null) return;
-  
-        foreach (Transform child in m_ContentContainer)
-        {
-            Destroy(child.gameObject);
-        }
-        m_UIItem.Clear();
+        DespawnAll();
+
+        if (data?.petStorage?.generalProduces == null) return;
 
         foreach (var produceData in data.petStorage.generalProduces)
         {
             if (produceData == null) continue;
 
-            UIProduceItem newElement = Instantiate(m_PrefabElement, m_ContentContainer);
-            newElement.InitAndSetup(produceData);
-            m_UIItem.Add(newElement);
+            UIProduceItem item = m_Pool.Spawn();
+            item.transform.SetParent(m_ContentContainer, false);
+            item.InitAndSetup(produceData);
+            m_ActiveItems.Add(item);
         }
     }
+
+    protected override void DespawnItem(UIProduceItem item) => m_Pool.Despawn(item);
 }

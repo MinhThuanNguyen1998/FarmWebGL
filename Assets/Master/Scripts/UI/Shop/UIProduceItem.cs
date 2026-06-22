@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Zenject;
 public class UIProduceItem : MonoBehaviour
 {
     [SerializeField] private Image m_AvatarImage;
     [SerializeField] private TextMeshProUGUI m_NameText;
     [SerializeField] private TextMeshProUGUI m_CountText;
+
     public string ItemName { get; private set; }
 
     public void InitAndSetup(ProduceData produceData)
@@ -29,5 +30,21 @@ public class UIProduceItem : MonoBehaviour
             Sprite loadedSprite = Resources.Load<Sprite>($"Avatar/{ItemName}");
             if (loadedSprite != null) m_AvatarImage.sprite = loadedSprite;
         }
+    }
+
+    public void OnSpawned()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void OnDespawned()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public class Pool : MonoMemoryPool<UIProduceItem>
+    {
+        protected override void OnSpawned(UIProduceItem item) => item.OnSpawned();
+        protected override void OnDespawned(UIProduceItem item) => item.OnDespawned();
     }
 }
