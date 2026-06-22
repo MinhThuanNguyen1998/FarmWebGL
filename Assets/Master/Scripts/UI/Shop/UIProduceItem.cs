@@ -1,29 +1,28 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIItem : MonoBehaviour
+public class UIProduceItem : MonoBehaviour
 {
     [SerializeField] private Image m_AvatarImage;
     [SerializeField] private TextMeshProUGUI m_NameText;
     [SerializeField] private TextMeshProUGUI m_CountText;
-
     public string ItemName { get; private set; }
 
-    public void InitAndSetup(ItemData itemData)
+    public void InitAndSetup(ProduceData produceData)
     {
-        if (itemData == null)
+        if (produceData == null)
         {
             m_NameText?.SetText(string.Empty);
             m_CountText?.SetText("0");
             return;
         }
 
-        ItemName = itemData.name;
+        ItemName = produceData.name;
         m_NameText?.SetText(ItemName);
-        m_CountText?.SetText(itemData.count.ToString());
+        m_CountText?.SetText(produceData.count.ToString());
 
         if (m_AvatarImage != null && !string.IsNullOrEmpty(ItemName))
         {

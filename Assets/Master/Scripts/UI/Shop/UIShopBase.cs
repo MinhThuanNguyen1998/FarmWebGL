@@ -4,10 +4,10 @@ using System.Linq;
 using UnityEngine;
 using Zenject;
 
-public abstract class UIShopBase : MonoBehaviour
+public abstract class UIShopBase<T> : MonoBehaviour where T : MonoBehaviour
 {
     [Header("UI Elements Setup")]
-    protected List<UIItem> m_UIItem = new List<UIItem>();
+    protected List<T> m_UIItem = new List<T>();
 
     protected SignalBus m_SignalBus;
     protected UserDataService m_UserDataService;

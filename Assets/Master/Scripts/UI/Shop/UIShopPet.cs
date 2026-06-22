@@ -1,32 +1,31 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
-using Zenject;
 
-public class UIShopPet : UIShopBase
+public class UIShopPet : UIShopBase<UIPetItem>
 {
     [Header("Dynamic UI Setup")]
-    [SerializeField] private UIItem m_PrefabElement;
-    [SerializeField] private Transform m_ContentContainer;
+    [SerializeField] private UIPetItem m_PrefabElement; 
+    [SerializeField] private Transform m_ContentContainer; 
+
     protected override void UpdateUI(UserData data)
     {
-        if (data == null || data.pet == null || data.pet.items == null) return;
+       
+        if (data == null || data.petStorage == null || data.petStorage.animalGroups == null) return;
 
         foreach (Transform child in m_ContentContainer)
         {
-            Destroy(child.gameObject);
+            Destroy(child.gameObject); 
         }
-        m_UIItem.Clear(); 
+        m_UIItem.Clear();
 
-        foreach (var itemData in data.pet.items)
+        foreach (var groupData in data.petStorage.animalGroups)
         {
-            if (itemData == null) continue;
-            UIItem newElement = Instantiate(m_PrefabElement, m_ContentContainer);
-            newElement.InitAndSetup(itemData);
-            m_UIItem.Add(newElement);
-        }
+            if (groupData == null) continue;
 
+            UIPetItem newElement = Instantiate(m_PrefabElement, m_ContentContainer);
+            newElement.InitAndSetup(groupData); 
+            m_UIItem.Add(newElement); 
+        }
     }
 }
