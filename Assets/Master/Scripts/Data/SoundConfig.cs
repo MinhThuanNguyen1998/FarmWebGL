@@ -6,11 +6,17 @@ public enum SoundType
     None = 0,
     BackgroundMusic = 1,
    
+    
 
     // SFX
     CoinEffect = 100,
     ClickedButton = 101,
-   
+
+    // Animal Sounds
+    Cat = 1000,
+    Chicken = 1001,
+
+
 }
 
 [System.Serializable]

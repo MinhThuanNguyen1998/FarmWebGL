@@ -16,6 +16,7 @@ public abstract class AnimalSpawerBase : MonoBehaviour
 
     protected SignalBus m_SignalBus;
     protected UserDataService m_UserDataService;
+    protected DiContainer m_Container;
 
     private IAnimalPool m_AnimalPool;
 
@@ -23,11 +24,12 @@ public abstract class AnimalSpawerBase : MonoBehaviour
     public void Construct(
         SignalBus signalBus,
         UserDataService userDataService,
-        Dictionary<AnimalType, GameObject> animalPrefabs)
+        Dictionary<AnimalType, GameObject> animalPrefabs,
+        DiContainer container)
     {
         m_SignalBus = signalBus;
         m_UserDataService = userDataService;
-
+        m_Container = container;
         if (!animalPrefabs.TryGetValue(m_AnimalType, out var prefab) || prefab == null)
         {
             Debug.LogError($"[{name}] Can not find an AnimalType.{m_AnimalType} in GameInstaller.");
@@ -57,7 +59,14 @@ public abstract class AnimalSpawerBase : MonoBehaviour
 
     public virtual GameObject SpawnAnimal()
     {
-        return m_AnimalPool.Spawn(m_SpawnPoint.position, m_SpawnPoint.rotation);
+        GameObject animal = m_AnimalPool.Spawn(m_SpawnPoint.position, m_SpawnPoint.rotation);
+
+        if (animal != null && m_Container != null)
+        {
+            m_Container.InjectGameObject(animal);
+        }
+
+        return animal;
     }
 
     public virtual void DespawnAnimal(GameObject animal)

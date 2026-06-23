@@ -439,6 +439,10 @@ MonoBehaviour:
   m_SoundsList:
   - type: 101
     clip: {fileID: 8300000, guid: a61b97f2dc9ce674b9425d055adebd2c, type: 3}
+  - type: 1000
+    clip: {fileID: 8300000, guid: 3f4c3ff41b4f9cf418914536972c38dd, type: 3}
+  - type: 1001
+    clip: {fileID: 8300000, guid: 3fc146ed2ef0d2c4c90c486f6c09fcaa, type: 3}
 --- !u!4 &1108529689
 Transform:
   m_ObjectHideFlags: 0

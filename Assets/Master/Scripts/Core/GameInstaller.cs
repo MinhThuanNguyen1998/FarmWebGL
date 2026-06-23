@@ -12,6 +12,9 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private GameObject m_CatPrefab;
     [SerializeField] private GameObject m_ChickenPrefab;
 
+    [Header("Environment")]
+    [SerializeField] private MovementArea m_MovementArea;
+
     public override void InstallBindings()
     {
         // Pet item pool — initial size 5, expand as needed
@@ -37,6 +40,10 @@ public class GameInstaller : MonoInstaller
             .AsSingle()
             .WhenInjectedInto(typeof(AnimalSpawerBase));
 
+        // Movement area registry
+        Container.Bind<MovementArea>()
+            .FromInstance(m_MovementArea)
+            .AsSingle();
     }
 
 }

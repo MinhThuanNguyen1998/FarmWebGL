@@ -590,6 +590,8 @@ GameObject:
   - component: {fileID: 8830169821511997491}
   - component: {fileID: 8855816880146883500}
   - component: {fileID: 7727170279033436281}
+  - component: {fileID: 213328029594979790}
+  - component: {fileID: 4760623053761389523}
   m_Layer: 0
   m_Name: Cat
   m_TagString: Untagged
@@ -661,6 +663,36 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &213328029594979790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3889505221947961135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54dd30a04b6cad0439b682e0923a1339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AnimalSoundType: 1000
+  m_MinInterval: 10
+  m_MaxInterval: 30
+--- !u!114 &4760623053761389523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3889505221947961135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66373079c6f9d1d4eaebec85e28c6333, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MoveSpeed: 3
+  m_MinWaitTime: 2
+  m_MaxWaitTime: 5
 --- !u!1 &4243205277574310117
 GameObject:
   m_ObjectHideFlags: 0
