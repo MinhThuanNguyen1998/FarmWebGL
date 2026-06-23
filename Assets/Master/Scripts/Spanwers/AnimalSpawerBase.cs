@@ -9,7 +9,7 @@ public abstract class AnimalSpawerBase : MonoBehaviour
 {
     [SerializeField] protected Transform m_SpawnPoint;
     [SerializeField] protected string m_GroupName;
-    [SerializeField] protected GameObject m_AnimalPrefab;
+    [SerializeField] private AnimalType m_AnimalType;
 
     [SerializeField] private int m_InitialPoolSize = 10;
     [SerializeField] private int m_MaxPoolSize = 50;
@@ -20,17 +20,23 @@ public abstract class AnimalSpawerBase : MonoBehaviour
     private IAnimalPool m_AnimalPool;
 
     [Inject]
-    public void Construct(SignalBus signalBus, UserDataService userDataService)
+    public void Construct(
+        SignalBus signalBus,
+        UserDataService userDataService,
+        Dictionary<AnimalType, GameObject> animalPrefabs)
     {
         m_SignalBus = signalBus;
         m_UserDataService = userDataService;
-    }
 
-    protected virtual void Awake()
-    {
+        if (!animalPrefabs.TryGetValue(m_AnimalType, out var prefab) || prefab == null)
+        {
+            Debug.LogError($"[{name}] Can not find an AnimalType.{m_AnimalType} in GameInstaller.");
+            return;
+        }
+
         var poolParent = new GameObject($"[Pool_{gameObject.name}]").transform;
         poolParent.SetParent(this.transform);
-        m_AnimalPool = new AnimalPool(m_AnimalPrefab, poolParent, m_InitialPoolSize, m_MaxPoolSize);
+        m_AnimalPool = new AnimalPool(prefab, poolParent, m_InitialPoolSize, m_MaxPoolSize);
     }
 
     protected virtual void OnEnable()
