@@ -1,0 +1,63 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using UnityEngine;
+using UnityEngine.UIElements;
+using Zenject;
+
+public abstract class AnimalSpawerBase : MonoBehaviour
+{
+    [SerializeField] protected Transform m_SpawnPoint;
+    [SerializeField] protected string m_GroupName;
+    [SerializeField] protected GameObject m_AnimalPrefab;
+
+    [SerializeField] private int m_InitialPoolSize = 10;
+    [SerializeField] private int m_MaxPoolSize = 50;
+
+    protected SignalBus m_SignalBus;
+    protected UserDataService m_UserDataService;
+
+    private IAnimalPool m_AnimalPool;
+
+    [Inject]
+    public void Construct(SignalBus signalBus, UserDataService userDataService)
+    {
+        m_SignalBus = signalBus;
+        m_UserDataService = userDataService;
+    }
+
+    protected virtual void Awake()
+    {
+        var poolParent = new GameObject($"[Pool_{gameObject.name}]").transform;
+        poolParent.SetParent(this.transform);
+        m_AnimalPool = new AnimalPool(m_AnimalPrefab, poolParent, m_InitialPoolSize, m_MaxPoolSize);
+    }
+
+    protected virtual void OnEnable()
+    {
+        m_SignalBus.Subscribe<UserDataLoadedSignal>(OnUserDataLoaded);
+        if (m_UserDataService.IsLoaded)
+            UpdateAnimals(m_UserDataService.Data);
+    }
+
+    protected virtual void OnDisable()
+    {
+        m_SignalBus.Unsubscribe<UserDataLoadedSignal>(OnUserDataLoaded);
+    }
+
+    private void OnUserDataLoaded(UserDataLoadedSignal signal) => UpdateAnimals(signal.Data);
+
+    protected abstract void UpdateAnimals(UserData data);
+
+    public virtual GameObject SpawnAnimal()
+    {
+        return m_AnimalPool.Spawn(m_SpawnPoint.position, m_SpawnPoint.rotation);
+    }
+
+    public virtual void DespawnAnimal(GameObject animal)
+    {
+        if (animal == null) return;
+        m_AnimalPool.Despawn(animal);
+    }
+
+}

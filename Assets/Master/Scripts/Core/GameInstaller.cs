@@ -7,6 +7,7 @@ public class GameInstaller : MonoInstaller
     [Header("Shop Item Prefabs")]
     [SerializeField] private UIPetItem m_PetItemPrefab;
     [SerializeField] private UIProduceItem m_ProduceItemPrefab;
+
     public override void InstallBindings()
     {
         // Pet item pool — initial size 5, expand as needed
@@ -20,6 +21,9 @@ public class GameInstaller : MonoInstaller
             .WithInitialSize(5)
             .FromComponentInNewPrefab(m_ProduceItemPrefab)
             .UnderTransformGroup("ProduceItemPool");
+
+
+       
     }
 
 }
