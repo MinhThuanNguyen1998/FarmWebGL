@@ -7,7 +7,6 @@ public class CatSpawner : AnimalSpawerBase
 {
     private readonly List<GameObject> m_SpawnedCats = new List<GameObject>();
    
-   
     protected override void UpdateAnimals(UserData data)
     {
         if (data?.petStorage?.animalGroups == null) return;
@@ -18,9 +17,9 @@ public class CatSpawner : AnimalSpawerBase
 
         if (catGroup?.animals == null) return;
 
-        for (int i = 0; i < catGroup.animals.Count; i++)
+        foreach (var animalData in catGroup.animals)
         {
-            GameObject cat = SpawnAnimal();
+            GameObject cat = SpawnAnimal(animalData);
             if (cat != null)
                 m_SpawnedCats.Add(cat);
         }

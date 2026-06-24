@@ -17,7 +17,11 @@ public static class Config
     public static string Login_Scene = "Login";
     public static string Bootstrap_Scene = "Bootstrap";
 
-   
+    // Animal Text
+    public static string Days_Left_First = "Còn:";
+    public static string Days_Left_Last = " ngày";
+
+
 
 }
 

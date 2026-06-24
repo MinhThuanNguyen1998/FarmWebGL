@@ -61,7 +61,6 @@ public abstract class AnimalMovementBase : MonoBehaviour
             m_MovementCoroutine = null;
         }
     }
-
     private void TriggerMovementLoop()
     {
         if (m_MovementCoroutine != null) StopCoroutine(m_MovementCoroutine);
@@ -110,7 +109,6 @@ public abstract class AnimalMovementBase : MonoBehaviour
             }
         }
     }
-
     private void SetNextTarget()
     {
         Bounds bounds = m_TargetCollider.bounds;

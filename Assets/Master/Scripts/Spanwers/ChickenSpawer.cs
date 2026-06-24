@@ -17,9 +17,9 @@ public class ChickenSpawer : AnimalSpawerBase
 
         if (chickenGroup?.animals == null) return;
 
-        for (int i = 0; i < chickenGroup.animals.Count; i++)
+        foreach (var animalData in chickenGroup.animals)
         {
-            GameObject chicken = SpawnAnimal();
+            GameObject chicken = SpawnAnimal(animalData);
             if (chicken != null)
                 m_SpawnedChickens.Add(chicken);
         }
