@@ -1,20 +1,23 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class AnimalPool : IAnimalPool
 {
     private readonly GameObject m_Prefab;
     private readonly Transform m_PoolParent;
     private readonly int m_MaxSize;
+    private readonly DiContainer m_Container;
 
     private readonly Stack<GameObject> m_Inactive = new Stack<GameObject>();
     private readonly HashSet<GameObject> m_Active = new HashSet<GameObject>();
 
-    public AnimalPool(GameObject prefab, Transform poolParent, int initialSize, int maxSize)
+    public AnimalPool(GameObject prefab, Transform poolParent, int initialSize, int maxSize, DiContainer container)
     {
         m_Prefab = prefab;
         m_PoolParent = poolParent;
-        m_MaxSize = maxSize; 
+        m_MaxSize = maxSize;
+        m_Container = container;
 
         for (int i = 0; i < initialSize; i++)
             m_Inactive.Push(CreateNew());
@@ -64,7 +67,9 @@ public class AnimalPool : IAnimalPool
     private GameObject CreateNew()
     {
         var obj = Object.Instantiate(m_Prefab, m_PoolParent);
+        m_Container.InjectGameObject(obj);
         obj.SetActive(false);
         return obj;
     }
+
 }

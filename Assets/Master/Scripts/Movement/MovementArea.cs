@@ -10,26 +10,39 @@ public class MovementArea : MonoBehaviour
         public AnimalType animalType;
         public Collider movementCollider;
     }
-
+ 
     [SerializeField]
     private List<AnimalMovementZone> movementZones = new List<AnimalMovementZone>();
-
-    public Collider GetMovementAreaFor(AnimalType type)
+ 
+    private Dictionary<AnimalType, Collider> m_ZoneCache;
+ 
+    private void Awake()
     {
+        m_ZoneCache = new Dictionary<AnimalType, Collider>(movementZones.Count);
         foreach (var zone in movementZones)
         {
-            if (zone.animalType == type)
+            if (zone.movementCollider == null)
             {
-                return zone.movementCollider;
+                Debug.LogWarning($"[MovementArea] Zone for {zone.animalType} has no collider assigned.");
+                continue;
             }
+ 
+            if (!m_ZoneCache.TryAdd(zone.animalType, zone.movementCollider))
+                Debug.LogWarning($"[MovementArea] Duplicate zone for {zone.animalType} — skipping.");
         }
-
-        Debug.LogWarning($"Can not find a movement area for: {type}");
+    }
+ 
+    public Collider GetMovementAreaFor(AnimalType type)
+    {
+        if (m_ZoneCache.TryGetValue(type, out var collider)) return collider;
+ 
+        Debug.LogWarning($"[MovementArea] Cannot find movement area for: {type}");
         return null;
     }
-
+ 
     public List<AnimalMovementZone> GetAllMovementZones()
     {
         return movementZones;
     }
+
 }
