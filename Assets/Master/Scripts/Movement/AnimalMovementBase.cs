@@ -17,6 +17,7 @@ public abstract class AnimalMovementBase : MonoBehaviour
     protected abstract AnimalType AnimalType { get; }
     protected MovementArea m_MovementArea;
 
+    private AnimalAnimation m_AnimalAnimation;
     private Collider m_TargetCollider;
     private Vector3 m_TargetPosition;
 
@@ -32,6 +33,7 @@ public abstract class AnimalMovementBase : MonoBehaviour
     {
         // Wait 1 frame to ensure Zenject dependency injection and environment are fully ready
         yield return null;
+        m_AnimalAnimation = GetComponent<AnimalAnimation>();
         m_TargetCollider = m_MovementArea?.GetMovementAreaFor(AnimalType);
 
         if (m_TargetCollider == null)
@@ -76,6 +78,7 @@ public abstract class AnimalMovementBase : MonoBehaviour
 
             // 2. Move towards the destination until close enough
             // Using sqrMagnitude instead of Vector3.Distance to bypass expensive square root calculations (0.05f * 0.05f = 0.0025f)
+            m_AnimalAnimation?.SetAnimTarget(1f);
             while ((m_TargetPosition - transform.position).sqrMagnitude > 0.0025f)
             {
                 // Rotate towards target
@@ -94,6 +97,7 @@ public abstract class AnimalMovementBase : MonoBehaviour
                 yield return null;
             }
             // 3. Idle/Wait before picking the next target destination
+            m_AnimalAnimation?.SetAnimTarget(0f);
             yield return new WaitForSeconds(Random.Range(m_MinWaitTime, m_MaxWaitTime));
         }
     }

@@ -1183,6 +1183,9 @@ GameObject:
   - component: {fileID: 963563087290846557}
   - component: {fileID: 8811677368541847738}
   - component: {fileID: 1512369711899443034}
+  - component: {fileID: 2940548113521652285}
+  - component: {fileID: -3062281841547154439}
+  - component: {fileID: -8698845007373073915}
   m_Layer: 0
   m_Name: Chicken
   m_TagString: Untagged
@@ -1254,3 +1257,49 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2940548113521652285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8789469456989594489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c530322fd2542449acdf301b612500b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AnimalSoundType: 1001
+  m_MinInterval: 10
+  m_MaxInterval: 30
+--- !u!114 &-3062281841547154439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8789469456989594489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbc0165d53b18bc4888b022e4a51dcc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MoveSpeed: 2
+  m_TurnSpeed: 8
+  m_MinWaitTime: 2
+  m_MaxWaitTime: 5
+--- !u!114 &-8698845007373073915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8789469456989594489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 903093f0b205d7942a78c456d38d6307, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_VerticalID: Vert
+  m_AnimBlendSpeed: 4.5
+  m_Animator: {fileID: 1512369711899443034}
