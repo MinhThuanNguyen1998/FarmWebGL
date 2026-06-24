@@ -20,7 +20,9 @@ public abstract class AnimalMovementBase : MonoBehaviour
     private Collider m_TargetCollider;
     private Vector3 m_TargetPosition;
 
-    // Store the coroutine reference to safely manage its lifecycle
+    // Flag to prevent OnEnable from triggering movement before Start() finishes
+    private bool m_IsInitialized = false;
+
     private Coroutine m_MovementCoroutine;
 
     [Inject]
@@ -37,12 +39,16 @@ public abstract class AnimalMovementBase : MonoBehaviour
             Debug.LogError($"[{name}] Cannot find movement area for {AnimalType}!");
             yield break;
         }
+
+        m_IsInitialized = true;
         TriggerMovementLoop();
     }
 
     private void OnEnable()
     {
-        if (m_TargetCollider != null) TriggerMovementLoop();
+        // Guard: only restart movement if Start() has already completed initialization
+        if (m_IsInitialized && m_TargetCollider != null)
+            TriggerMovementLoop();
     }
 
     private void OnDisable()
@@ -80,13 +86,13 @@ public abstract class AnimalMovementBase : MonoBehaviour
                     Quaternion targetRotation = Quaternion.LookRotation(direction);
                     transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, m_TurnSpeed * Time.deltaTime);
                 }
+
                 // Move position
                 transform.position = Vector3.MoveTowards(transform.position, m_TargetPosition, m_MoveSpeed * Time.deltaTime);
 
                 // Wait for the next frame
                 yield return null;
             }
-
             // 3. Idle/Wait before picking the next target destination
             yield return new WaitForSeconds(Random.Range(m_MinWaitTime, m_MaxWaitTime));
         }
@@ -102,13 +108,16 @@ public abstract class AnimalMovementBase : MonoBehaviour
                 transform.position.y,
                 Random.Range(bounds.min.z, bounds.max.z)
             );
-
-            // Accept point if it's inside the collider, or use the last attempt as fallback
-            if (m_TargetCollider.ClosestPoint(randomPoint) == randomPoint || i == 9)
+            // ClosestPoint check works correctly for convex colliders (Box, Sphere, Capsule, convex MeshCollider).
+            if (m_TargetCollider.ClosestPoint(randomPoint) == randomPoint)
             {
                 m_TargetPosition = randomPoint;
-                break;
+                return;
             }
         }
+        // Fallback: clamp to collider center if no valid point found after 10 attempts
+        m_TargetPosition = bounds.center;
+        m_TargetPosition.y = transform.position.y;
     }
+
 }
