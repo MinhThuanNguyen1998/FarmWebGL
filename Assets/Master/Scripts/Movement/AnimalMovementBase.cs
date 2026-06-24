@@ -92,13 +92,22 @@ public abstract class AnimalMovementBase : MonoBehaviour
 
                 // Move position
                 transform.position = Vector3.MoveTowards(transform.position, m_TargetPosition, m_MoveSpeed * Time.deltaTime);
+                m_AnimalAnimation?.Tick();
 
                 // Wait for the next frame
                 yield return null;
             }
             // 3. Idle/Wait before picking the next target destination
+            // Manual loop instead of WaitForSeconds to keep ticking animation blend each frame
             m_AnimalAnimation?.SetAnimTarget(0f);
-            yield return new WaitForSeconds(Random.Range(m_MinWaitTime, m_MaxWaitTime));
+            float waitTime = Random.Range(m_MinWaitTime, m_MaxWaitTime);
+            float elapsed = 0f;
+            while (elapsed < waitTime)
+            {
+                m_AnimalAnimation?.Tick();
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
         }
     }
 

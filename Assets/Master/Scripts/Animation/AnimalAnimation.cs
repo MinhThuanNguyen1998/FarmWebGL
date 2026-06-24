@@ -12,10 +12,9 @@ public class AnimalAnimation : MonoBehaviour
     private float m_CurrentAnimValue = 0f;
     private float m_TargetAnimValue = 0f;
 
-    private void Update()
+    public void Tick()
     {
         if (m_Animator == null) return;
-
         m_CurrentAnimValue = Mathf.MoveTowards(m_CurrentAnimValue, m_TargetAnimValue, m_AnimBlendSpeed * Time.deltaTime);
         m_Animator.SetFloat(m_VerticalID, m_CurrentAnimValue);
     }
