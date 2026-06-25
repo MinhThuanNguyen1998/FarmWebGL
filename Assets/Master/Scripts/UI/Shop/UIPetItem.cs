@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class UIPetItem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI m_CountText;
     [SerializeField] private Button m_ActionButton;
 
+    [Inject] private UserDataService m_UserDataService;
     public string ItemName { get; private set; }
 
     public void InitAndSetup(AnimalGroup groupData)
@@ -35,17 +37,34 @@ public class UIPetItem : MonoBehaviour
         }
 
         m_ActionButton?.onClick.RemoveAllListeners();
-        m_ActionButton?.onClick.AddListener(() => OnButtonAddAnimal(groupData));
+        m_ActionButton?.onClick.AddListener(() => OnButtonAddAnimal(groupData).Forget());
     }
 
-    private void OnButtonAddAnimal(AnimalGroup groupData)
+    private async UniTaskVoid OnButtonAddAnimal(AnimalGroup groupData)
     {
-        // TODO
+        if (m_UserDataService == null)
+        {
+            Debug.LogError("UserDataService is not injected properly!");
+            return;
+        }
+
+        // Disable button interaction to prevent spamming network requests during processing
+        if (m_ActionButton != null) m_ActionButton.interactable = false;
+
+        // Call the service to process the animal addition via backend API[cite: 1, 2]
+        bool isSuccess = await m_UserDataService.AddAnimalAsync(groupData.groupName);
+
+        // Re-enable the action button only if the operation failed[cite: 1]
+        if (!isSuccess && m_ActionButton != null)
+        {
+            m_ActionButton.interactable = true;
+        }
     }
 
     public void OnSpawned()
     {
         gameObject.SetActive(true);
+        if (m_ActionButton != null) m_ActionButton.interactable = true;
     }
 
     public void OnDespawned()
