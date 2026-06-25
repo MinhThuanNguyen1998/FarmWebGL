@@ -1328,7 +1328,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5982157989426126508, guid: f585595e233fb7b4fba7209dd5503f0e, type: 3}
       propertyPath: m_Name
-      value: Animal
+      value: Text3d_Animal
       objectReference: {fileID: 0}
     - target: {fileID: 7595368306972075223, guid: f585595e233fb7b4fba7209dd5503f0e, type: 3}
       propertyPath: m_fontSize

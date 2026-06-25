@@ -15,6 +15,8 @@ public class GameInstaller : MonoInstaller
     [Header("Environment")]
     [SerializeField] private MovementArea m_MovementArea;
 
+    [Header("Billboard Settings")]
+    [SerializeField] private Transform m_TargetTransform;
     public override void InstallBindings()
     {
         // Pet item pool — initial size 5, expand as needed
@@ -44,6 +46,14 @@ public class GameInstaller : MonoInstaller
         Container.Bind<MovementArea>()
             .FromInstance(m_MovementArea)
             .AsSingle();
+
+        // Bind BillboardManager and automatically set the target after creation
+        Container.BindInterfacesAndSelfTo<BillboardManager>()
+            .AsSingle()
+            .OnInstantiated<BillboardManager>((ctx, manager) =>
+            {
+                manager.SetTarget(m_TargetTransform);
+            });
     }
 
 }
