@@ -35,10 +35,10 @@ public class UIPetItem : MonoBehaviour
         }
 
         m_ActionButton?.onClick.RemoveAllListeners();
-        m_ActionButton?.onClick.AddListener(() => OnClickItem(groupData));
+        m_ActionButton?.onClick.AddListener(() => OnButtonAddAnimal(groupData));
     }
 
-    private void OnClickItem(AnimalGroup groupData)
+    private void OnButtonAddAnimal(AnimalGroup groupData)
     {
         // TODO
     }

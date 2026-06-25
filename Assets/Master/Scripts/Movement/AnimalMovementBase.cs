@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using Zenject;
-
 public abstract class AnimalMovementBase : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -45,7 +43,6 @@ public abstract class AnimalMovementBase : MonoBehaviour
         m_IsInitialized = true;
         TriggerMovementLoop();
     }
-
     private void OnEnable()
     {
         // Guard: only restart movement if Start() has already completed initialization

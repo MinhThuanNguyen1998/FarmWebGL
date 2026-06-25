@@ -47,7 +47,7 @@ public abstract class AnimalSpawerBase : MonoBehaviour
             UpdateAnimals(m_UserDataService.Data);
     }
 
-    protected virtual void OnDisable()
+    protected virtual void OnDisable() 
     {
         m_SignalBus.Unsubscribe<UserDataLoadedSignal>(OnUserDataLoaded);
     }
