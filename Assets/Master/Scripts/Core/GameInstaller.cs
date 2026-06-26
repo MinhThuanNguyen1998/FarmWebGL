@@ -60,7 +60,7 @@ public class GameInstaller : MonoInstaller
                 manager.SetTarget(m_TargetTransform);
             });
         // Register AnimalShopHandler to handle AddAnimalSignal from UI
-        Container.BindInterfacesTo<AnimalShopHandler>().AsSingle();
+        Container.BindInterfacesTo<AnimalController>().AsSingle();
     }
 
 }

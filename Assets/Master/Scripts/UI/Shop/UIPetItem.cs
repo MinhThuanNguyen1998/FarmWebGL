@@ -43,7 +43,7 @@ public class UIPetItem : MonoBehaviour
     private void OnButtonAddAnimal()
     {
         if (m_ActionButton != null) m_ActionButton.interactable = false;
-        m_SignalBus.Fire(new AddAnimalSignal(ItemName));
+        m_SignalBus.Fire(new AddAnimalSignal(ItemName)); // Fire signal to AnimalController
     }
     private void OnAddAnimalResult(AddAnimalResultSignal signal)
     {

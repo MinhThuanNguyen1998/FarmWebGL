@@ -8,7 +8,7 @@ public class UserDataService
     public UserData Data { get; private set; }
     public bool IsLoaded { get; private set; }
 
-    [Inject] private readonly SignalBus _signalBus;
+    [Inject] private readonly SignalBus m_SignalBus;
 
     public async UniTask<LoadDataResult> LoadAllDataAsync()
     {
@@ -17,7 +17,7 @@ public class UserDataService
         {
             Data = JsonUtility.FromJson<UserData>(jsonResponse);
             IsLoaded = true;
-            _signalBus.Fire(new UserDataLoadedSignal(Data));
+            m_SignalBus.Fire(new UserDataLoadedSignal(Data));
         }
         return result;
     }
