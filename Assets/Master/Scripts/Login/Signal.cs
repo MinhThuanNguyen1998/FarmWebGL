@@ -30,3 +30,25 @@ public struct UserDataLoadedSignal
         Data = data;
     }
 }
+
+// Animals
+public struct AddAnimalSignal
+{
+    public string GroupName;
+
+    public AddAnimalSignal(string groupName)
+    {
+        GroupName = groupName;
+    }
+}
+public struct AddAnimalResultSignal
+{
+    public string GroupName;
+    public bool IsSuccess;
+
+    public AddAnimalResultSignal(string groupName, bool isSuccess)
+    {
+        GroupName = groupName;
+        IsSuccess = isSuccess;
+    }
+}

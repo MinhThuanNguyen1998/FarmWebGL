@@ -19,6 +19,11 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private Transform m_TargetTransform;
     public override void InstallBindings()
     {
+        // Signals
+        Container.DeclareSignal<AddAnimalSignal>();
+        Container.DeclareSignal<AddAnimalResultSignal>();
+
+
         // Pet item pool — initial size 5, expand as needed
         Container.BindMemoryPool<UIPetItem, UIPetItem.Pool>()
             .WithInitialSize(5)
@@ -54,6 +59,8 @@ public class GameInstaller : MonoInstaller
             {
                 manager.SetTarget(m_TargetTransform);
             });
+        // Register AnimalShopHandler to handle AddAnimalSignal from UI
+        Container.BindInterfacesTo<AnimalShopHandler>().AsSingle();
     }
 
 }
