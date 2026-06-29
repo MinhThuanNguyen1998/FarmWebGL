@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 [Serializable]
 public class ApiUserDataResponse
 {
@@ -32,7 +31,6 @@ public class UserInfo
     public string amount; 
 }
 
-
 [Serializable]
 public class FarmAnimal
 {
@@ -45,7 +43,6 @@ public class FarmAnimal
     public string start_time;
     public string finish_time;
 }
-
 
 [Serializable]
 public class UserData
@@ -74,7 +71,6 @@ public class UserData
             System.Globalization.CultureInfo.InvariantCulture,
             out double val) ? val : 0;
     }
-
     public Dictionary<string, List<FarmAnimal>> GetAnimalGroups()
     {
         var groups = new Dictionary<string, List<FarmAnimal>>();

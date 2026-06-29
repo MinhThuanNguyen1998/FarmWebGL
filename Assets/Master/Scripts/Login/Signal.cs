@@ -30,7 +30,16 @@ public struct UserDataLoadedSignal
         Data = data;
     }
 }
+// Inventory signals
+public struct InventoryLoadedSignal
+{
+    public List<InventoryItem> Items;
 
+    public InventoryLoadedSignal(List<InventoryItem> items)
+    {
+        Items = items;
+    }
+}
 // Animals
 public struct AddAnimalSignal
 {

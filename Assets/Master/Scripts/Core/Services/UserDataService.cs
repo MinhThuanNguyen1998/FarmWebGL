@@ -9,16 +9,16 @@ public class UserDataService
     public bool IsLoaded { get; private set; }
 
     [Inject] private readonly SignalBus m_SignalBus;
+    [Inject] private readonly NetworkService m_NetworkService;
+    [Inject] private readonly InventoryService m_InventoryService;
 
     public async UniTask<LoadDataResult> LoadAllDataAsync()
     {
-        var (result, jsonResponse) = await SendGetRequestAsync(ApiConfig.API_GET_USER_DATA_URL);
-        if (result == LoadDataResult.Success)
-        {
-            // Parse wrapper 
-            var response = JsonUtility.FromJson<ApiUserDataResponse>(jsonResponse);
+        var (result, response) = await m_NetworkService.SendGetRequestAsync<ApiUserDataResponse>(ApiConfig.API_GET_USER_DATA_URL);
 
-            if (response != null && response.success && response.data != null)
+        if (result == LoadDataResult.Success && response != null)
+        {
+            if (response.success && response.data != null)
             {
                 Data = new UserData
                 {
@@ -34,13 +34,29 @@ public class UserDataService
                 return LoadDataResult.FetchError;
             }
         }
+        else
+        {
+            return result;
+        }
+
+        // Load inventory
+        var inventoryResult = await m_InventoryService.LoadInventoryAsync();
+        if (inventoryResult == LoadDataResult.Success)
+        {
+            m_SignalBus.Fire(new InventoryLoadedSignal(m_InventoryService.Items));
+        }
+        else
+        {
+            Debug.LogWarning($"[UserDataService] Inventory load failed: {inventoryResult}");
+        }
+
         return result;
     }
 
     public async UniTask<bool> AddAnimalAsync(string groupName)
     {
-        string jsonBody = JsonUtility.ToJson(new AddAnimalRequest { groupName = groupName });
-        if (await SendPostRequestAsync(ApiConfig.API_ADD_ANIMAL_URL, jsonBody))
+        var requestBody = new AddAnimalRequest { groupName = groupName };
+        if (await m_NetworkService.SendPostRequestAsync(ApiConfig.API_ADD_ANIMAL_URL, requestBody))
         {
             Debug.Log($"Successfully added animal: '{groupName}'");
             return await LoadAllDataAsync() == LoadDataResult.Success;
@@ -52,58 +68,7 @@ public class UserDataService
     {
         IsLoaded = false;
         Data = null;
-    }
-
-    private UnityWebRequest CreateBaseRequest(string url, string method)
-    {
-        var request = new UnityWebRequest(url, method);
-        request.SetRequestHeader("Authorization", $"Bearer {TokenManager.GetAccessToken()}");
-        return request;
-    }
-
-    private async UniTask<(LoadDataResult status, string content)> SendGetRequestAsync(string url)
-    {
-        try
-        {
-            using var request = CreateBaseRequest(url, UnityWebRequest.kHttpVerbGET);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            await request.SendWebRequest().ToUniTask();
-
-            if (request.result == UnityWebRequest.Result.Success)
-                return (LoadDataResult.Success, request.downloadHandler.text);
-
-            if (request.responseCode == 401) Debug.LogWarning("Token expired (401 Unauthorized).");
-            else Debug.LogError($"API GET Error: {request.error} (Code: {request.responseCode})");
-
-            return (request.responseCode == 401 ? LoadDataResult.Unauthorized : LoadDataResult.FetchError, null);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"System error during GET: {ex.Message}");
-            return (LoadDataResult.FetchError, null);
-        }
-    }
-
-    private async UniTask<bool> SendPostRequestAsync(string url, string jsonBody)
-    {
-        try
-        {
-            using var request = CreateBaseRequest(url, UnityWebRequest.kHttpVerbPOST);
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            await request.SendWebRequest().ToUniTask();
-            if (request.result == UnityWebRequest.Result.Success) return true;
-
-            Debug.LogError($"API POST Error: {request.error} (Code: {request.responseCode})");
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"System error during POST: {ex.Message}");
-            return false;
-        }
+        m_InventoryService.ResetData();
     }
 
     [Serializable] private class AddAnimalRequest { public string groupName; }

@@ -5,38 +5,38 @@ using UnityEngine;
 using Zenject;
 
 public abstract class UIShopBase<TItem, TPool> : MonoBehaviour
-    where TItem : MonoBehaviour
+     where TItem : MonoBehaviour
     where TPool : IMemoryPool
 {
     protected TPool m_Pool;
     protected SignalBus m_SignalBus;
-    protected UserDataService m_UserDataService;
+    protected InventoryService m_InventoryService;
 
     protected readonly List<TItem> m_ActiveItems = new List<TItem>();
 
     [Inject]
-    public void Construct(SignalBus signalBus, UserDataService userDataService, TPool pool)
+    public void Construct(SignalBus signalBus, InventoryService inventoryService, TPool pool)
     {
         m_SignalBus = signalBus;
-        m_UserDataService = userDataService;
+        m_InventoryService = inventoryService;
         m_Pool = pool;
     }
 
     protected virtual void OnEnable()
     {
-        m_SignalBus.Subscribe<UserDataLoadedSignal>(OnUserDataLoaded);
-        if (m_UserDataService.IsLoaded)
-            UpdateUI(m_UserDataService.Data);
+        m_SignalBus.Subscribe<InventoryLoadedSignal>(OnInventoryLoaded);
+        if (m_InventoryService.IsLoaded)
+            UpdateUI(m_InventoryService.Items);
     }
 
     protected virtual void OnDisable()
     {
-        m_SignalBus.Unsubscribe<UserDataLoadedSignal>(OnUserDataLoaded);
+        m_SignalBus.Unsubscribe<InventoryLoadedSignal>(OnInventoryLoaded);
     }
 
-    private void OnUserDataLoaded(UserDataLoadedSignal signal) => UpdateUI(signal.Data);
+    private void OnInventoryLoaded(InventoryLoadedSignal signal) => UpdateUI(signal.Items);
 
-    protected abstract void UpdateUI(UserData data);
+    protected abstract void UpdateUI(List<InventoryItem> items);
 
     protected void DespawnAll()
     {

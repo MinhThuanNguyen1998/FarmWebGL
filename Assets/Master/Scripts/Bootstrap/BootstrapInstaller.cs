@@ -12,9 +12,12 @@ public class BootstrapInstaller : MonoInstaller
         Container.Bind<LoadingBar>().FromInstance(m_LoadingBar).AsSingle().NonLazy();
         Container.Bind<AuthService>().AsSingle().NonLazy();
         Container.Bind<SceneLoader>().AsSingle().NonLazy();
+        Container.Bind<NetworkService>().AsSingle().NonLazy();
+        Container.Bind<InventoryService>().AsSingle().NonLazy();
         Container.Bind<UserDataService>().AsSingle().NonLazy();
 
         // Signals
         Container.DeclareSignal <UserDataLoadedSignal>();
+        Container.DeclareSignal<InventoryLoadedSignal>();
     }
 }

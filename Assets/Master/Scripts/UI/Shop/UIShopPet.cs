@@ -4,32 +4,22 @@ using UnityEngine;
 using Zenject;
 public class UIShopPet : UIShopBase<UIPetItem, UIPetItem.Pool>
 {
-   
-    [SerializeField] private Transform m_ContentContainer; 
+    [SerializeField] private Transform m_ContentContainer;
 
-    protected override void UpdateUI(UserData data)
+    protected override void UpdateUI(List<InventoryItem> items)
     {
-
         DespawnAll();
 
-        if (data?.farm == null) return;
+        if (items == null || items.Count == 0) return;
 
-
-        var groups = new Dictionary<string, List<FarmAnimal>>();
-        foreach (var farmAnimal in data.farm)
-        {
-            if (!groups.ContainsKey(farmAnimal.animal_name))
-                groups[farmAnimal.animal_name] = new List<FarmAnimal>();
-            groups[farmAnimal.animal_name].Add(farmAnimal);
-        }
-
-        foreach (var kvp in groups)
+        foreach (var inventoryItem in items)
         {
             UIPetItem item = m_Pool.Spawn();
             item.transform.SetParent(m_ContentContainer, false);
-            item.InitAndSetup(kvp.Key, kvp.Value);
+            item.InitAndSetup(inventoryItem);
             m_ActiveItems.Add(item);
         }
     }
+
     protected override void DespawnItem(UIPetItem item) => m_Pool.Despawn(item);
 }
