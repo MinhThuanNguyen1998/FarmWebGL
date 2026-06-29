@@ -15,9 +15,24 @@ public class UserDataService
         var (result, jsonResponse) = await SendGetRequestAsync(ApiConfig.API_GET_USER_DATA_URL);
         if (result == LoadDataResult.Success)
         {
-            Data = JsonUtility.FromJson<UserData>(jsonResponse);
-            IsLoaded = true;
-            m_SignalBus.Fire(new UserDataLoadedSignal(Data));
+            // Parse wrapper 
+            var response = JsonUtility.FromJson<ApiUserDataResponse>(jsonResponse);
+
+            if (response != null && response.success && response.data != null)
+            {
+                Data = new UserData
+                {
+                    userInfo = response.data.user,
+                    farm = response.data.farm
+                };
+                IsLoaded = true;
+                m_SignalBus.Fire(new UserDataLoadedSignal(Data));
+            }
+            else
+            {
+                Debug.LogError("[UserDataService] API success=false or data null.");
+                return LoadDataResult.FetchError;
+            }
         }
         return result;
     }

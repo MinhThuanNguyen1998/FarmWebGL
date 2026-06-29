@@ -4,6 +4,6 @@ using UnityEngine;
 
 public enum AnimalType
 {
-    Cat,
-    Chicken,
+    cat,
+    chicken,
 }

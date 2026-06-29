@@ -12,15 +12,22 @@ public class UIShopPet : UIShopBase<UIPetItem, UIPetItem.Pool>
 
         DespawnAll();
 
-        if (data?.petStorage?.animalGroups == null) return;
+        if (data?.farm == null) return;
 
-        foreach (var groupData in data.petStorage.animalGroups)
+
+        var groups = new Dictionary<string, List<FarmAnimal>>();
+        foreach (var farmAnimal in data.farm)
         {
-            if (groupData == null) continue;
+            if (!groups.ContainsKey(farmAnimal.animal_name))
+                groups[farmAnimal.animal_name] = new List<FarmAnimal>();
+            groups[farmAnimal.animal_name].Add(farmAnimal);
+        }
 
+        foreach (var kvp in groups)
+        {
             UIPetItem item = m_Pool.Spawn();
             item.transform.SetParent(m_ContentContainer, false);
-            item.InitAndSetup(groupData);
+            item.InitAndSetup(kvp.Key, kvp.Value);
             m_ActiveItems.Add(item);
         }
     }

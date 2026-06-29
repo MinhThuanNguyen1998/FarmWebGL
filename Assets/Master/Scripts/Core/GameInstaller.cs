@@ -6,7 +6,7 @@ public class GameInstaller : MonoInstaller
 {
     [Header("Shop Item Prefabs")]
     [SerializeField] private UIPetItem m_PetItemPrefab;
-    [SerializeField] private UIProduceItem m_ProduceItemPrefab;
+    //[SerializeField] private UIProduceItem m_ProduceItemPrefab;
 
     [Header("Animal Prefabs")]
     [SerializeField] private GameObject m_CatPrefab;
@@ -30,17 +30,17 @@ public class GameInstaller : MonoInstaller
             .FromComponentInNewPrefab(m_PetItemPrefab)
             .UnderTransformGroup("PetItemPool");
 
-        // Produce item pool
-        Container.BindMemoryPool<UIProduceItem, UIProduceItem.Pool>()
-            .WithInitialSize(5)
-            .FromComponentInNewPrefab(m_ProduceItemPrefab)
-            .UnderTransformGroup("ProduceItemPool");
+        //// Produce item pool
+        //Container.BindMemoryPool<UIProduceItem, UIProduceItem.Pool>()
+        //    .WithInitialSize(5)
+        //    .FromComponentInNewPrefab(m_ProduceItemPrefab)
+        //    .UnderTransformGroup("ProduceItemPool");
 
         // Animal prefab registry
         var animalPrefabs = new Dictionary<AnimalType, GameObject>
         {
-            { AnimalType.Cat,     m_CatPrefab     },
-            { AnimalType.Chicken, m_ChickenPrefab },
+            { AnimalType.cat,     m_CatPrefab     },
+            { AnimalType.chicken, m_ChickenPrefab },
         };
 
         Container.BindInstance(animalPrefabs)

@@ -9,17 +9,15 @@ public class ChickenSpawer : AnimalSpawerBase
 
     protected override void UpdateAnimals(UserData data)
     {
-        if (data?.petStorage?.animalGroups == null) return;
+        if (data?.farm == null) return;
 
         DespawnAll();
 
-        AnimalGroup chickenGroup = data.petStorage.animalGroups.Find(group => group.groupName == m_GroupName);
-
-        if (chickenGroup?.animals == null) return;
-
-        foreach (var animalData in chickenGroup.animals)
+        foreach (var farmAnimal in data.farm)
         {
-            GameObject chicken = SpawnAnimal(animalData);
+            if (farmAnimal.animal_name != m_GroupName) continue;
+
+            GameObject chicken = SpawnAnimal(farmAnimal);
             if (chicken != null)
                 m_SpawnedChickens.Add(chicken);
         }

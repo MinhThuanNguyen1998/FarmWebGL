@@ -5195,7 +5195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SpawnPoint: {fileID: 1893169489}
-  m_GroupName: "g\xE0"
+  m_GroupName: chicken
   m_AnimalType: 1
   m_InitialPoolSize: 10
   m_MaxPoolSize: 50
@@ -6809,7 +6809,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SpawnPoint: {fileID: 909475041}
-  m_GroupName: "m\xE8o"
+  m_GroupName: cat
   m_AnimalType: 0
   m_InitialPoolSize: 10
   m_MaxPoolSize: 50
@@ -12914,7 +12914,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_PetItemPrefab: {fileID: 8307973355442642966, guid: 16c6716e74bff65409aea5ab675ca4c7, type: 3}
-  m_ProduceItemPrefab: {fileID: 8669813111401065283, guid: 017037cd960788e41a02dcdc0590b424, type: 3}
   m_CatPrefab: {fileID: 3889505221947961135, guid: 36bd46c066cb970499de76f1bd621874, type: 3}
   m_ChickenPrefab: {fileID: 8789469456989594489, guid: 8fdae24c419430441accfdec78c174d6, type: 3}
   m_MovementArea: {fileID: 1167826971}
@@ -15068,7 +15067,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 126a27f17b3c92a4fb2f0f347ea413b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ContentContainer: {fileID: 401908768724822903}
 --- !u!224 &7969829832558381672
 RectTransform:
   m_ObjectHideFlags: 0

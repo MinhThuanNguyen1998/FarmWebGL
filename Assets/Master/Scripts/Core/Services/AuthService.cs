@@ -20,7 +20,7 @@ public class AuthService
     public class UserData
     {
         public string username;
-        public string password;
+        
     }
     [System.Serializable]
     public class LoginDataContent

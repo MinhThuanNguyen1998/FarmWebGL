@@ -33,11 +33,11 @@ public class UIAnimalDaysLeft : MonoBehaviour
             m_BillboardManager.Unregister(m_DaysLeftText.transform);
         }
     }
-    public void UpdateUIDaysLeft(AnimalData animalData)
+    public void UpdateUIDaysLeft(FarmAnimal farmAnimal)
     {
         if (m_DaysLeftText != null)
         {
-            m_DaysLeftText.text = Config.Days_Left_First+ animalData.daysLeft.ToString() + Config.Days_Left_Last;
+            m_DaysLeftText.text = Config.Days_Left_First+ farmAnimal.remaining_days.ToString() + Config.Days_Left_Last;
         }
         else
         {

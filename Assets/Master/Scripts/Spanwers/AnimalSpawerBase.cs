@@ -56,12 +56,12 @@ public abstract class AnimalSpawerBase : MonoBehaviour
 
     protected abstract void UpdateAnimals(UserData data);
 
-    public virtual GameObject SpawnAnimal(AnimalData animalData)
+    public virtual GameObject SpawnAnimal(FarmAnimal farmAnimal)
     {
         var animal = m_AnimalPool.Spawn(m_SpawnPoint.position, m_SpawnPoint.rotation);
         if (animal == null) return null;
 
-        animal.GetComponent<UIAnimalDaysLeft>()?.UpdateUIDaysLeft(animalData);
+        animal.GetComponent<UIAnimalDaysLeft>()?.UpdateUIDaysLeft(farmAnimal);
 
         return animal;
 

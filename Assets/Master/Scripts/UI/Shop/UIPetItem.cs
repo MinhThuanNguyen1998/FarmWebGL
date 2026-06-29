@@ -15,19 +15,19 @@ public class UIPetItem : MonoBehaviour
     [Inject] private SignalBus m_SignalBus;
     public string ItemName { get; private set; }
 
-    public void InitAndSetup(AnimalGroup groupData)
+    public void InitAndSetup(string animalName, List<FarmAnimal> animals)
     {
-        if (groupData == null)
+        if (string.IsNullOrEmpty(animalName))
         {
             m_NameText?.SetText(string.Empty);
             m_CountText?.SetText("0");
             return;
         }
 
-        ItemName = groupData.groupName;
+        ItemName = animalName;
         m_NameText?.SetText(ItemName);
 
-        int totalCount = groupData.animals != null ? groupData.animals.Count : 0;
+        int totalCount = animals != null ? animals.Count : 0;
         m_CountText?.SetText(totalCount.ToString());
 
         if (m_AvatarImage != null && !string.IsNullOrEmpty(ItemName))

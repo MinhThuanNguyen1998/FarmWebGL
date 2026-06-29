@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class ChickenMovement : AnimalMovementBase
 {
-    protected override AnimalType AnimalType => AnimalType.Chicken;
+    protected override AnimalType AnimalType => AnimalType.chicken;
 }

@@ -6,20 +6,18 @@ using Zenject;
 public class CatSpawner : AnimalSpawerBase
 {
     private readonly List<GameObject> m_SpawnedCats = new List<GameObject>();
-   
+
     protected override void UpdateAnimals(UserData data)
     {
-        if (data?.petStorage?.animalGroups == null) return;
+        if (data?.farm == null) return;
 
         DespawnAll();
 
-        AnimalGroup catGroup = data.petStorage.animalGroups.Find(group => group.groupName == m_GroupName);
-
-        if (catGroup?.animals == null) return;
-
-        foreach (var animalData in catGroup.animals)
+        foreach (var farmAnimal in data.farm)
         {
-            GameObject cat = SpawnAnimal(animalData);
+            if (farmAnimal.animal_name != m_GroupName) continue;
+
+            GameObject cat = SpawnAnimal(farmAnimal);
             if (cat != null)
                 m_SpawnedCats.Add(cat);
         }

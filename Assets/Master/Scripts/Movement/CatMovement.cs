@@ -5,6 +5,6 @@ using Zenject;
 
 public class CatMovement : AnimalMovementBase
 {
-    protected override AnimalType AnimalType => AnimalType.Cat;
+    protected override AnimalType AnimalType => AnimalType.cat;
 
 }
