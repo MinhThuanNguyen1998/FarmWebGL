@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 public class UIShopPet : UIShopBase<UIPetItem, UIPetItem.Pool>
@@ -12,11 +14,14 @@ public class UIShopPet : UIShopBase<UIPetItem, UIPetItem.Pool>
 
         if (items == null || items.Count == 0) return;
 
-        foreach (var inventoryItem in items)
+        var sorted = items.OrderBy(x => x.name, StringComparer.Ordinal).ToList();
+
+        for (int i = 0; i < sorted.Count; i++)
         {
             UIPetItem item = m_Pool.Spawn();
             item.transform.SetParent(m_ContentContainer, false);
-            item.InitAndSetup(inventoryItem);
+            item.transform.SetSiblingIndex(i);
+            item.InitAndSetup(sorted[i]);
             m_ActiveItems.Add(item);
         }
     }
