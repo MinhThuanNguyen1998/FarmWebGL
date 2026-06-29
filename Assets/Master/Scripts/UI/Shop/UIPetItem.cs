@@ -8,7 +8,7 @@ using Zenject;
 public class UIPetItem : MonoBehaviour
 {
     [SerializeField] private Image m_AvatarImage;
-    [SerializeField] private TextMeshProUGUI m_NameText;
+    [SerializeField] private TextMeshProUGUI m_NameText; 
     [SerializeField] private TextMeshProUGUI m_CountText;
     [SerializeField] private Button m_ActionButton;
 
