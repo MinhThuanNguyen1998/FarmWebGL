@@ -9,7 +9,7 @@ public class AuthService
     [Inject] private readonly NetworkService m_NetworkService;
 
     [Serializable]
-    private class LoginRequest
+    public class LoginRequest
     {
         public string username;
         public string password;

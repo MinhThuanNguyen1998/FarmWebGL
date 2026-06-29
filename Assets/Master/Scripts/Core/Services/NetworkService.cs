@@ -7,6 +7,9 @@ using UnityEngine.Networking;
 
 public class NetworkService
 {
+    /// <summary>
+    /// Creates a UnityWebRequest with an Authorization Bearer token header.
+    /// </summary>
     private UnityWebRequest CreateAuthenticatedRequest(string url, string method)
     {
         var request = new UnityWebRequest(url, method);
@@ -14,12 +17,17 @@ public class NetworkService
         return request;
     }
 
+    /// <summary>
+    /// Creates a standard UnityWebRequest without authentication headers.
+    /// </summary>
     private UnityWebRequest CreateUnauthenticatedRequest(string url, string method)
     {
         return new UnityWebRequest(url, method);
     }
 
-    // Authenticated GET — dùng cho mọi API cần token
+    /// <summary>
+    /// Authenticated GET request — used for any API endpoint requiring a token.
+    /// </summary>
     public async UniTask<(LoadDataResult status, T responseData)> SendGetRequestAsync<T>(string url) where T : class
     {
         try
@@ -35,8 +43,10 @@ public class NetworkService
                 return (LoadDataResult.Success, response);
             }
 
-            if (request.responseCode == 401) Debug.LogWarning("Token expired (401 Unauthorized).");
-            else Debug.LogError($"API GET Error: {request.error} (Code: {request.responseCode})");
+            if (request.responseCode == 401)
+                Debug.LogWarning("Token expired (401 Unauthorized).");
+            else
+                Debug.LogError($"API GET Error: {request.error} (Code: {request.responseCode})");
 
             return (request.responseCode == 401 ? LoadDataResult.Unauthorized : LoadDataResult.FetchError, null);
         }
@@ -47,7 +57,9 @@ public class NetworkService
         }
     }
 
-    // Authenticated POST — dùng cho các action cần token (vd: mua thú)
+    /// <summary>
+    /// Authenticated POST request — used for actions requiring a token (e.g., purchasing items).
+    /// </summary>
     public async UniTask<bool> SendPostRequestAsync<TRequest>(string url, TRequest body)
     {
         try
@@ -69,29 +81,64 @@ public class NetworkService
         }
     }
 
-    // Unauthenticated POST với response body — dùng cho login (chưa có token)
+    /// <summary>
+    /// Unauthenticated POST request with response body — used for Login (no token yet).
+    /// Automatically handles routing for both Production Server (URL Params) and Mockoon (JSON Body).
+    /// </summary>
     public async UniTask<(bool networkSuccess, TResponse responseData)> SendPublicPostRequestAsync<TRequest, TResponse>(
         string url, TRequest body) where TResponse : class
     {
         try
         {
-            using var request = CreateUnauthenticatedRequest(url, UnityWebRequest.kHttpVerbPOST);
-            string jsonBody = JsonUtility.ToJson(body);
+            UnityWebRequest request = null;
 
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            await request.SendWebRequest().ToUniTask();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            // Check if the request is a LoginRequest to apply specific environment logic
+            if (body is AuthService.LoginRequest loginData)
             {
-                var response = JsonUtility.FromJson<TResponse>(request.downloadHandler.text);
-                return (true, response);
+                // If it is the production server, pass data via Query Parameters
+                if (url.Contains("homagame.com"))
+                {
+                    url = $"{url}?username={UnityWebRequest.EscapeURL(loginData.username)}&password={UnityWebRequest.EscapeURL(loginData.password)}";
+                    request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+                }
+                // If it is Mockoon/Localhost, keep sending data via JSON Body as originally configured
+                else
+                {
+                    request = CreateUnauthenticatedRequest(url, UnityWebRequest.kHttpVerbPOST);
+                    string jsonBody = JsonUtility.ToJson(body);
+                    request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
+                    request.SetRequestHeader("Content-Type", "application/json");
+                }
+            }
+            else
+            {
+                // Fallback for any other generic public POST requests
+                request = CreateUnauthenticatedRequest(url, UnityWebRequest.kHttpVerbPOST);
+                string jsonBody = JsonUtility.ToJson(body);
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
+                request.SetRequestHeader("Content-Type", "application/json");
             }
 
-            Debug.LogError($"API POST Error: {request.error} (Code: {request.responseCode})");
-            return (false, null);
+            // Wrap in a try-finally block via standard utilizing logic to guarantee disposal
+            try
+            {
+                request.downloadHandler = new DownloadHandlerBuffer();
+
+                await request.SendWebRequest().ToUniTask();
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    var response = JsonUtility.FromJson<TResponse>(request.downloadHandler.text);
+                    return (true, response);
+                }
+
+                Debug.LogError($"API POST Error: {request.error} (Code: {request.responseCode})");
+                return (false, null);
+            }
+            finally
+            {
+                request?.Dispose();
+            }
         }
         catch (Exception ex)
         {
