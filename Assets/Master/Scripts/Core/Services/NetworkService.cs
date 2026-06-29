@@ -26,7 +26,7 @@ public class NetworkService
     }
 
     /// <summary>
-    /// Authenticated GET request — used for any API endpoint requiring a token.
+    /// Sends an authenticated GET request to endpoints requiring a token.
     /// </summary>
     public async UniTask<(LoadDataResult status, T responseData)> SendGetRequestAsync<T>(string url) where T : class
     {
@@ -58,7 +58,7 @@ public class NetworkService
     }
 
     /// <summary>
-    /// Authenticated POST request — used for actions requiring a token (e.g., purchasing items).
+    /// Sends an authenticated POST request for actions requiring a token (e.g., purchasing items).
     /// </summary>
     public async UniTask<bool> SendPostRequestAsync<TRequest>(string url, TRequest body)
     {
@@ -82,63 +82,43 @@ public class NetworkService
     }
 
     /// <summary>
-    /// Unauthenticated POST request with response body — used for Login (no token yet).
-    /// Automatically handles routing for both Production Server (URL Params) and Mockoon (JSON Body).
+    /// Sends an unauthenticated POST request that returns a response body (e.g., Login).
+    /// Dynamically appends username/password as URL query parameters if they exist in the request body.
     /// </summary>
     public async UniTask<(bool networkSuccess, TResponse responseData)> SendPublicPostRequestAsync<TRequest, TResponse>(
         string url, TRequest body) where TResponse : class
     {
-        try
+       try
         {
-            UnityWebRequest request = null;
-
-            // Check if the request is a LoginRequest to apply specific environment logic
+            // Instead of checking the URL/domain, we check the type of the Request Model.
+            // If the model is explicitly a LoginRequest, we extract fields and append them to the URL.
             if (body is AuthService.LoginRequest loginData)
             {
-                // If it is the production server, pass data via Query Parameters
-                if (url.Contains("homagame.com"))
-                {
-                    url = $"{url}?username={UnityWebRequest.EscapeURL(loginData.username)}&password={UnityWebRequest.EscapeURL(loginData.password)}";
-                    request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-                }
-                // If it is Mockoon/Localhost, keep sending data via JSON Body as originally configured
-                else
-                {
-                    request = CreateUnauthenticatedRequest(url, UnityWebRequest.kHttpVerbPOST);
-                    string jsonBody = JsonUtility.ToJson(body);
-                    request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
-                    request.SetRequestHeader("Content-Type", "application/json");
-                }
+                string separator = url.Contains("?") ? "&" : "?";
+                url = $"{url}{separator}username={UnityWebRequest.EscapeURL(loginData.username)}&password={UnityWebRequest.EscapeURL(loginData.password)}";
             }
-            else
+
+            using var request = CreateUnauthenticatedRequest(url, UnityWebRequest.kHttpVerbPOST);
+            request.downloadHandler = new DownloadHandlerBuffer();
+
+            // If it's NOT a login request, we attach the standard JSON body payload
+            if (!(body is AuthService.LoginRequest))
             {
-                // Fallback for any other generic public POST requests
-                request = CreateUnauthenticatedRequest(url, UnityWebRequest.kHttpVerbPOST);
                 string jsonBody = JsonUtility.ToJson(body);
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
                 request.SetRequestHeader("Content-Type", "application/json");
             }
 
-            // Wrap in a try-finally block via standard utilizing logic to guarantee disposal
-            try
+            await request.SendWebRequest().ToUniTask();
+
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                request.downloadHandler = new DownloadHandlerBuffer();
-
-                await request.SendWebRequest().ToUniTask();
-
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    var response = JsonUtility.FromJson<TResponse>(request.downloadHandler.text);
-                    return (true, response);
-                }
-
-                Debug.LogError($"API POST Error: {request.error} (Code: {request.responseCode})");
-                return (false, null);
+                var response = JsonUtility.FromJson<TResponse>(request.downloadHandler.text);
+                return (true, response);
             }
-            finally
-            {
-                request?.Dispose();
-            }
+
+            Debug.LogError($"API POST Error: {request.error} (Code: {request.responseCode})");
+            return (false, null);
         }
         catch (Exception ex)
         {
