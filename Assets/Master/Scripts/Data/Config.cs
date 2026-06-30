@@ -22,6 +22,10 @@ public static class Config
     public static string Days_Left_Last = " ngày";
 
 
+    // Reward
+    public static string RewardSuccess = "Nhận phần thưởng thành công!";
+    public static string RewardAlreadyClaimed = "Đã nhận phần thưởng này";
+
 
 }
 
