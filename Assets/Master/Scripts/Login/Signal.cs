@@ -15,7 +15,14 @@ public struct LoginRequestSignal
     }
 }
 public struct LoginSuccessSignal { }
-public struct LoginFailedSignal { }
+public struct LoginFailedSignal 
+{
+    public string ErrorMessage;
+    public LoginFailedSignal(string errorMessage)
+    {
+        ErrorMessage = errorMessage;
+    }
+}
 
 public struct LoginDataErrorSignal { }
 

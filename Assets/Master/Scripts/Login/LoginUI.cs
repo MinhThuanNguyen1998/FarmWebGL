@@ -46,21 +46,24 @@ public class LoginUI : MonoBehaviour
 
     private void OnLoginSuccess()
     {
-        Debug.Log("Login successful!");
+        //Debug.Log("Login successful!");
         SetUIState(true);
         m_StatusText.text = Config.LoginSuccess;
         
     }
-    private void OnLoginFailed()
+    private void OnLoginFailed(LoginFailedSignal signal)
     {
-        Debug.Log("Login failed!");
+        //Debug.Log("Login failed!");
         SetUIState(true);
-        m_StatusText.text = Config.LoginFailed;
         m_PasswordInputField.text = string.Empty;
+
+        // Dịch thông báo lỗi dựa trên nội dung text hoặc fallback mặc định
+        string englishError = signal.ErrorMessage;
+        m_StatusText.text = ErrorTranslator.GetVietnameseErrorMessage(signal.ErrorMessage);
     }
     private void OnLoginDataError()
     {
-        Debug.Log("Login data error!");
+        //Debug.Log("Login data error!");
         SetUIState(true);
         m_StatusText.text = Config.DataLoadError;
     }
@@ -71,4 +74,5 @@ public class LoginUI : MonoBehaviour
         m_UsernameInputField.interactable = isInteractable;
         m_PasswordInputField.interactable = isInteractable;
     }
+    
 }

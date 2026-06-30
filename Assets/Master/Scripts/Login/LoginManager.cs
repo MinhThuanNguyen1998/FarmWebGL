@@ -30,7 +30,7 @@ public class LoginManager : MonoBehaviour
 
             if (!authResult.IsSuccess)
             {
-                m_SignalBus.Fire(new LoginFailedSignal());
+                m_SignalBus.Fire(new LoginFailedSignal(authResult.ErrorMessage));
                 return; 
             }
 
@@ -49,12 +49,14 @@ public class LoginManager : MonoBehaviour
                 }
 
                 m_SignalBus.Fire(new LoginDataErrorSignal());
+                
             }
         }
         catch (Exception ex)
         {
             Debug.LogError($"[LoginManager] Critical error during login process: {ex.Message}");
-            m_SignalBus.Fire(new LoginFailedSignal());
+            m_SignalBus.Fire(new LoginFailedSignal(Config.ServerError));
+            
         }
     }
 

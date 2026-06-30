@@ -53,15 +53,16 @@ public class AuthService
             var (networkSuccess, response) = await m_NetworkService.SendPublicPostRequestAsync<LoginRequest, TokenResponse>(
                 ApiConfig.API_AUTH_URL, requestBody);
 
+            // Server Error
             if (!networkSuccess)
-                return new AuthResult { IsSuccess = false, ErrorMessage = Config.LoginFailed };
-
+                return new AuthResult { IsSuccess = false, ErrorMessage = Config.ServerError }; 
             if (response != null && response.status)
             {
                 TokenManager.SaveTokens(response.data?.access_token, "");
                 return new AuthResult { IsSuccess = true, Data = response };
             }
 
+            // Username or password incorrect
             string errorMsg = response != null ? response.message : Config.LoginFailed;
             return new AuthResult { IsSuccess = false, ErrorMessage = errorMsg };
         }

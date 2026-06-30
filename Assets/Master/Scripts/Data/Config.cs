@@ -7,7 +7,7 @@ public static class Config
     // Text for login process
     public static string LoginProcessing = "Đang đăng nhập...";
     public static string LoginEmptyFields = "Vui lòng nhập đầy đủ thông tin";
-    public static string LoginFailed = "Thông tin đăng nhập không chính xác";
+    public static string LoginFailed = "Sai Thông tin đăng nhập ";
     public static string LoginSuccess = "Đăng nhập thành công";
     public static string ServerError = "Lỗi kết nối đến server";
     public static string DataLoadError = "Không thể tải dữ liệu. Vui lòng thử lại.";
