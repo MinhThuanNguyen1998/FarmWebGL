@@ -12,6 +12,7 @@ public class UIUserInfor : MonoBehaviour
     private void OnEnable()
     {
         m_SignalBus.Subscribe<UserDataLoadedSignal>(OnUserDataLoaded);
+        m_SignalBus.Subscribe<RewardClaimedSignal>(OnRewardClaimed);
         if (m_UserDataService.IsLoaded)
         {
             UpdateUserInfor(m_UserDataService.Data);
@@ -20,12 +21,16 @@ public class UIUserInfor : MonoBehaviour
     private void OnDisable()
     {
         m_SignalBus.Unsubscribe<UserDataLoadedSignal>(OnUserDataLoaded);
+        m_SignalBus.Unsubscribe<RewardClaimedSignal>(OnRewardClaimed);
     }
     private void OnUserDataLoaded(UserDataLoadedSignal signal)
     {
         UpdateUserInfor(signal.Data);
     }
-
+    private void OnRewardClaimed(RewardClaimedSignal signal)
+    {
+        m_TextMoney.text = MoneyFormatter.ParseAndFormat(signal.Data.total_amount_user);
+    }
     private void UpdateUserInfor(UserData data)
     {
         m_TextMoney.text = MoneyFormatter.ToShortString(data.money);

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,5 +20,19 @@ public static class MoneyFormatter
 
         return money.ToString("N0");
     }
+    public static string ParseAndFormat(string rawMoney)
+    {
+        if (string.IsNullOrEmpty(rawMoney)) return "0";
 
+        if (double.TryParse(rawMoney,
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out double val))
+        {
+            return ToShortString((long)val);
+        }
+
+        Debug.LogError($"[MoneyFormatter] Can not parse string: {rawMoney}");
+        return "0";
+    }
 }

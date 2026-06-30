@@ -66,33 +66,24 @@ public class UserDataService
     public async UniTask<bool> ClaimRewardAsync()
     {
         var (networkSuccess, response) = await m_NetworkService
-             .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_CLAIM_REWARD, new { });
-
-        if (!networkSuccess || response == null)
+         .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_CLAIM_REWARD, new { });
+        if (!networkSuccess || response == null || !response.status || response.data == null)
         {
-            Debug.LogError("[UserDataService] ClaimRewardAsync failed: no/invalid response from server.");
+            string errorMsg = response == null ? "no/invalid response" : response.message;
+            Debug.LogError($"[UserDataService] ClaimRewardAsync failed: {errorMsg}");
             return false;
         }
-
-        if (!response.status || response.data == null)
-        {
-            Debug.LogWarning($"[UserDataService] ClaimRewardAsync rejected: {response.message}");
-            return false;
-        }
-
         if (!response.data.can_claim)
         {
             Debug.LogWarning("[UserDataService] Reward already claimed today.");
             return false;
         }
-
         if (Data?.userInfo != null && !string.IsNullOrEmpty(response.data.total_amount_user))
         {
             Data.userInfo.amount = response.data.total_amount_user;
         }
 
         m_SignalBus.Fire(new RewardClaimedSignal(response.data));
-
         return true;
     }
 
