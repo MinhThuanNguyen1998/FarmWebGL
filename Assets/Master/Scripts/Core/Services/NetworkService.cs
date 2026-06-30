@@ -7,14 +7,56 @@ using UnityEngine.Networking;
 
 public class NetworkService
 {
-    private UnityWebRequest CreateRequest(string url, string method, bool isAuthenticated = true)
+    private UnityWebRequest CreateRequest(string url, string method, object body = null, bool isAuthenticated = true)
     {
-        var request = new UnityWebRequest(url, method);
+        var request = new UnityWebRequest(url, method) { downloadHandler = new DownloadHandlerBuffer() };
+
         if (isAuthenticated)
-        {
             request.SetRequestHeader("Authorization", $"Bearer {TokenManager.GetAccessToken()}");
+
+        if (body == null) return request;
+
+        if (body is AuthService.LoginRequest loginData)
+        {
+            var form = new WWWForm();
+            form.AddField("username", loginData.username);
+            form.AddField("password", loginData.password);
+            request.uploadHandler = new UploadHandlerRaw(form.data);
+            foreach (var header in form.headers) request.SetRequestHeader(header.Key, header.Value);
+        }
+        else
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(body));
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.SetRequestHeader("Content-Type", "application/json");
         }
         return request;
+    }
+
+    private async UniTask<(bool success, TResponse data)> SendPostCoreAsync<TRequest, TResponse>(string url, TRequest body, bool isAuthenticated) where TResponse : class
+    {
+        try
+        {
+            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body, isAuthenticated);
+            try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception */ }
+
+            bool isSuccess = request.result == UnityWebRequest.Result.Success;
+            bool isProtocolError = request.result == UnityWebRequest.Result.ProtocolError;
+
+            if ((isSuccess || isProtocolError) && !string.IsNullOrEmpty(request.downloadHandler?.text))
+            {
+                try { return (true, JsonUtility.FromJson<TResponse>(request.downloadHandler.text)); }
+                catch (Exception e) { Debug.LogError($"Parse error: {e.Message}"); }
+            }
+
+            LogNetworkError("POST", request);
+            return (false, null);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"System error during POST: {ex.Message}");
+            return (false, null);
+        }
     }
 
     public async UniTask<(LoadDataResult status, T responseData)> SendGetRequestAsync<T>(string url) where T : class
@@ -22,18 +64,12 @@ public class NetworkService
         try
         {
             using var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
-            request.downloadHandler = new DownloadHandlerBuffer();
-
             await request.SendWebRequest().ToUniTask();
 
             if (request.result == UnityWebRequest.Result.Success)
                 return (LoadDataResult.Success, JsonUtility.FromJson<T>(request.downloadHandler.text));
 
-            if (request.responseCode == 401)
-                Debug.LogWarning("Token expired (401 Unauthorized).");
-            else
-                Debug.LogError($"API GET Error: {request.error} (Code: {request.responseCode})");
-
+            LogNetworkError("GET", request);
             return (request.responseCode == 401 ? LoadDataResult.Unauthorized : LoadDataResult.FetchError, null);
         }
         catch (Exception ex)
@@ -45,78 +81,19 @@ public class NetworkService
 
     public async UniTask<bool> SendPostRequestAsync<TRequest>(string url, TRequest body)
     {
-        try
-        {
-            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST);
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(body));
-
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            await request.SendWebRequest().ToUniTask();
-            return request.result == UnityWebRequest.Result.Success;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"System error during POST: {ex.Message}");
-            return false;
-        }
+        using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
+        try { await request.SendWebRequest().ToUniTask(); } catch { }
+        return request.result == UnityWebRequest.Result.Success;
     }
 
-    public async UniTask<(bool networkSuccess, TResponse responseData)> SendPublicPostRequestAsync<TRequest, TResponse>(
-        string url, TRequest body) where TResponse : class
+    public UniTask<(bool networkSuccess, TResponse responseData)> SendAuthenticatedPostRequestAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
+        => SendPostCoreAsync<TRequest, TResponse>(url, body, isAuthenticated: true);
+    public UniTask<(bool networkSuccess, TResponse responseData)> SendPublicPostRequestAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
+        => SendPostCoreAsync<TRequest, TResponse>(url, body, isAuthenticated: false);
+
+    private void LogNetworkError(string method, UnityWebRequest request)
     {
-        try
-        {
-            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, isAuthenticated: false);
-            request.downloadHandler = new DownloadHandlerBuffer();
-
-            // Setup Body & Headers
-            if (body is AuthService.LoginRequest loginData)
-            {
-                WWWForm form = new WWWForm();
-                form.AddField("username", loginData.username);
-                form.AddField("password", loginData.password);
-                request.uploadHandler = new UploadHandlerRaw(form.data);
-                foreach (var header in form.headers) request.SetRequestHeader(header.Key, header.Value);
-            }
-            else
-            {
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(body));
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.SetRequestHeader("Content-Type", "application/json");
-            }
-
-            // Send Request
-            try { await request.SendWebRequest().ToUniTask(); }
-            catch (Exception ex) { Debug.LogWarning($"SendWebRequest threw: {ex.Message}"); }
-
-            // Handle Response
-            bool isSuccess = request.result == UnityWebRequest.Result.Success;
-            bool isProtocolError = request.result == UnityWebRequest.Result.ProtocolError;
-
-            if ((isSuccess || isProtocolError) && !string.IsNullOrEmpty(request.downloadHandler?.text))
-            {
-                try
-                {
-                    var response = JsonUtility.FromJson<TResponse>(request.downloadHandler.text);
-                    if (isProtocolError) Debug.LogWarning($"API POST Protocol Error (handled): Code {request.responseCode}");
-                    return (true, response);
-                }
-                catch (Exception parseEx)
-                {
-                    Debug.LogError($"Failed to parse response body: {parseEx.Message}");
-                }
-            }
-
-            Debug.LogError($"API POST Error: {request.error} (Code: {request.responseCode})");
-            return (false, null);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"System error during public POST: {ex.Message}");
-            return (false, null);
-        }
+        if (request.responseCode == 401) Debug.LogWarning("Token expired (401 Unauthorized).");
+        else Debug.LogError($"API {method} Error: {request.error} (Code: {request.responseCode})");
     }
 }

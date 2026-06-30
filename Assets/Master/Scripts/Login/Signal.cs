@@ -68,3 +68,13 @@ public struct AddAnimalResultSignal
         IsSuccess = isSuccess;
     }
 }
+// Reward signals
+public struct RewardClaimedSignal
+{
+    public RewardData Data;
+
+    public RewardClaimedSignal(RewardData data)
+    {
+        Data = data;
+    }
+}
