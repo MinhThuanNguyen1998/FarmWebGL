@@ -18,6 +18,7 @@ public class PopupBase : MonoBehaviour
     {
         this.m_PopupManager = popupManager;
     }
+
     public virtual void Setup(object data) { }
 
     public virtual void Show()
@@ -32,10 +33,11 @@ public class PopupBase : MonoBehaviour
             .SetUpdate(true);
     }
 
-    public virtual void Hide()
+    public virtual void Hide(System.Action onHideComplete = null)
     {
-        if (m_IsHiding) return; // Prevent calling Hide function multiple times
+        if (m_IsHiding) return;
         m_IsHiding = true;
+
         transform.DOKill();
         transform
             .DOScale(Vector3.zero, m_HideDuration)
@@ -43,7 +45,19 @@ public class PopupBase : MonoBehaviour
             .SetUpdate(true)
             .OnComplete(() =>
             {
-                m_PopupManager?.Close();
+                gameObject.SetActive(false);
+                m_IsHiding = false;
+                onHideComplete?.Invoke();
             });
+    }
+
+    public virtual void Close()
+    {
+        m_PopupManager?.CloseCurrentPopup();
+    }
+
+    protected virtual void OnDestroy()
+    {
+        transform.DOKill();
     }
 }

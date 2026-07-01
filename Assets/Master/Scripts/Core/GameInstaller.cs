@@ -58,7 +58,6 @@ public class GameInstaller : MonoInstaller
         Container.BindInterfacesTo<AnimalController>().AsSingle();
 
         // Popup
-        Container.Bind<PopupFactory>().AsSingle();
         Container.Bind<PopupManager>().AsSingle().WithArguments(m_CanvasRootPopup);
     }
 

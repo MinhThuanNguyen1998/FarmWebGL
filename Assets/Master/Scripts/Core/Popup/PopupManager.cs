@@ -1,61 +1,109 @@
-﻿using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 
-public class PopupManager 
+public class PopupManager
 {
-    Queue<PopupRequest> m_PopupQueue = new Queue<PopupRequest>();
-    PopupBase m_CurrentPopup;
-    PopupFactory m_PopupFactory;
-    Transform m_CanvasRootPopup;
-    bool m_IsShowing = false;
-    SignalBus m_SignalBus;
+    private readonly Queue<(PopupBase prefab, object data)> m_PopupQueue = new();
+    private readonly Dictionary<PopupBase, List<PopupBase>> m_Pool = new();
+    private readonly DiContainer m_Container;
+    private readonly Transform m_CanvasRoot;
 
-    public PopupManager(PopupFactory popupFactory, Transform canvasRootPopup, SignalBus signalBus)
+    private PopupBase m_CurrentPopup;
+    private bool m_IsShowing;
+
+    public PopupManager(DiContainer container, Transform canvasRootPopup)
     {
-        this.m_PopupFactory = popupFactory;
-        this.m_CanvasRootPopup = canvasRootPopup;
-        m_SignalBus = signalBus;
-       
+        m_Container = container;
+        m_CanvasRoot = canvasRootPopup;
     }
+
     public void ShowPopup(PopupBase prefab, object data = null)
     {
-        m_PopupQueue.Enqueue(new PopupRequest { prefab = prefab, data = data });
+        if (prefab == null) return;
+        m_PopupQueue.Enqueue((prefab, data));
         if (!m_IsShowing) ShowNext();
     }
-   
-    void  ShowNext()
-    {
-        if (m_PopupQueue.Count == 0) { m_IsShowing = false; return; }
 
-        m_IsShowing = true;
-        PopupRequest request = m_PopupQueue.Dequeue();
-
-        m_CurrentPopup = m_PopupFactory.Create(request.prefab.gameObject, m_CanvasRootPopup);
-        m_CurrentPopup.Setup(request.data);
-        m_CurrentPopup.Show();
-    }
-    public void Close()
+    private void ShowNext()
     {
-        if (m_CurrentPopup != null) 
+        while (m_PopupQueue.Count > 0)
         {
-            Object.Destroy(m_CurrentPopup.gameObject); 
-            m_CurrentPopup = null;
-        }
-        
-        ShowNext(); // After closing current popup, show the next one in queue
-    }
-    private void CloseImmediate()
-    {
-        if (m_CurrentPopup != null)
-        {
-            Object.Destroy(m_CurrentPopup.gameObject);
-            m_CurrentPopup = null;
-        }
+            var (prefab, data) = m_PopupQueue.Dequeue();
+            if (prefab == null) continue;
 
-        m_PopupQueue.Clear();
+            m_IsShowing = true;
+            m_CurrentPopup = GetPopupFromPool(prefab);
+            m_CurrentPopup.transform.SetAsLastSibling();
+
+            m_CurrentPopup.Setup(data);
+            m_CurrentPopup.Show();
+            return;
+        }
         m_IsShowing = false;
     }
 
+    public void CloseCurrentPopup()
+    {
+        if (m_CurrentPopup == null || !m_IsShowing) return;
+
+        var popupToHide = m_CurrentPopup;
+        m_CurrentPopup = null;
+        m_IsShowing = false;
+
+        popupToHide.Hide(() =>
+        {
+            ShowNext();
+        });
+    }
+
+    private PopupBase GetPopupFromPool(PopupBase prefab)
+    {
+        if (!m_Pool.TryGetValue(prefab, out var list))
+        {
+            list = m_Pool[prefab] = new List<PopupBase>();
+        }
+
+        list.RemoveAll(item => item == null);
+        var pooledPopup = list.FirstOrDefault(p => !p.gameObject.activeSelf);
+
+        if (pooledPopup != null) return pooledPopup;
+
+        var popupObj = m_Container.InstantiatePrefab(prefab.gameObject, m_CanvasRoot);
+        var newPopup = popupObj.GetComponent<PopupBase>();
+        list.Add(newPopup);
+        return newPopup;
+    }
+
+    public void ClearPool(bool forceDestroyActive = false)
+    {
+        m_PopupQueue.Clear();
+
+        foreach (var (prefab, list) in m_Pool.ToList())
+        {
+            if (list == null) continue;
+
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                var popup = list[i];
+                if (popup == null) continue;
+
+                if (popup.gameObject.activeSelf && !forceDestroyActive) continue;
+
+                if (popup == m_CurrentPopup) m_CurrentPopup = null;
+                Object.Destroy(popup.gameObject);
+                list.RemoveAt(i);
+            }
+
+            if (list.Count == 0) m_Pool.Remove(prefab);
+        }
+
+        if (forceDestroyActive || m_CurrentPopup == null)
+        {
+            m_CurrentPopup = null;
+            m_IsShowing = false;
+        }
+    }
 }

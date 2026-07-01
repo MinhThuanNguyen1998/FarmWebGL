@@ -18,4 +18,5 @@ public class UIPopupReward : PopupBase
         }
         if (m_TextTitle != null) m_TextTitle.text = m_Data.content;
     }
+    
 }
