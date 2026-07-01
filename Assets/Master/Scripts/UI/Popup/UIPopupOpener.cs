@@ -7,7 +7,7 @@ using Zenject;
 public class UIPopupOpener : MonoBehaviour
 {
     [Header("PrefabPopup")]
-    [SerializeField] private PopupBase m_PopupReward;
+    [SerializeField] private PopupBase m_Popup;
 
     [Inject] private readonly PopupManager m_PopupManager;
     [Inject] private readonly SignalBus m_SignalBus;
@@ -39,7 +39,7 @@ public class UIPopupOpener : MonoBehaviour
             data.content = Config.RewardAlreadyClaimed;
         }
 
-        m_PopupManager.ShowPopup(m_PopupReward, data);
+        m_PopupManager.ShowPopup(m_Popup, data);
     }
 
     public void OnAddAnimalResult(AddAnimalResultSignal signal)
@@ -48,6 +48,6 @@ public class UIPopupOpener : MonoBehaviour
 
         data.content = signal.IsSuccess ? Config.AddAnimalSuccess : Config.AddAnimalFailed;
 
-        m_PopupManager.ShowPopup(m_PopupReward, data);
+        m_PopupManager.ShowPopup(m_Popup, data);
     }
 }
