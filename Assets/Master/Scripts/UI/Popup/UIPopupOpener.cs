@@ -26,16 +26,17 @@ public class UIPopupOpener : MonoBehaviour
     
     public void OnReward(RewardClaimedSignal signal)
     {
+        RewardPopupData data = new RewardPopupData();
 
         if (signal.IsSuccess)
         {
-            Debug.Log(Config.RewardSuccess);
-            m_PopupManager.ShowPopup(m_PopupReward, Config.RewardSuccess);
+            data.content = Config.RewardSuccess;
         }
         else
         {
-            Debug.LogWarning(signal.ErrorMessage);
-            m_PopupManager.ShowPopup(m_PopupReward, signal.ErrorMessage);
+            data.content = Config.RewardAlreadyClaimed;
         }
+
+        m_PopupManager.ShowPopup(m_PopupReward, data);
     }
 }

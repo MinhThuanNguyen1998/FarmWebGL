@@ -16,12 +16,14 @@ public class GameInstaller : MonoInstaller
 
     [Header("Billboard Settings")]
     [SerializeField] private Transform m_TargetTransform;
+
+    [Header("Popup")]
+    [SerializeField] private Transform m_CanvasRootPopup;
     public override void InstallBindings()
     {
         // Signals
         Container.DeclareSignal<AddAnimalSignal>();
         Container.DeclareSignal<AddAnimalResultSignal>();
-        Container.DeclareSignal<RewardClaimedSignal>();
 
         // Pet item pool — initial size 5, expand as needed
         Container.BindMemoryPool<UIPetItem, UIPetItem.Pool>()
@@ -54,6 +56,10 @@ public class GameInstaller : MonoInstaller
             });
         // Register AnimalShopHandler to handle AddAnimalSignal from UI
         Container.BindInterfacesTo<AnimalController>().AsSingle();
+
+        // Popup
+        Container.Bind<PopupFactory>().AsSingle();
+        Container.Bind<PopupManager>().AsSingle().WithArguments(m_CanvasRootPopup);
     }
 
 }

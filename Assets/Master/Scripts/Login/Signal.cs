@@ -69,16 +69,17 @@ public struct AddAnimalResultSignal
     }
 }
 // Reward signals
-public struct RewardClaimedSignal
+public class RewardClaimedSignal
 {
-    public RewardData Data { get; }
     public bool IsSuccess { get; }
-    public string ErrorMessage { get; }
+    public string Message { get; }
+    public object Data { get; }
 
-    public RewardClaimedSignal(RewardData data)
-        => (Data, IsSuccess, ErrorMessage) = (data, true, string.Empty);
-
-    public RewardClaimedSignal(bool isSuccess, string errorMessage)
-        => (Data, IsSuccess, ErrorMessage) = (null, isSuccess, errorMessage);
+    public RewardClaimedSignal(bool isSuccess, string message = "", object data = null)
+    {
+        IsSuccess = isSuccess;
+        Message = message;
+        Data = data;
+    }
 }
 

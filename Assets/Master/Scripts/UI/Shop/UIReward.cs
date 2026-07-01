@@ -34,16 +34,8 @@ public class UIReward : MonoBehaviour
     private async void HandleClaimRewardClick()
     {
         Debug.Log("[UIReward] Player clicked Claim Reward button.");
-        bool isSuccess = await m_UserDataService.ClaimRewardAsync();
-
-        if (isSuccess)
-        {
-            
-        }
-        else
-        {
-           
-        }
+        await m_UserDataService.ClaimRewardAsync();
+        
     }
 
     private void SetButtonInteractable(bool isInteractable)

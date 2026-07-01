@@ -23,8 +23,8 @@ public static class Config
 
 
     // Reward
-    public static string RewardSuccess = "Nhận phần thưởng thành công!";
-    public static string RewardAlreadyClaimed = "Đã nhận phần thưởng này";
+    public static string RewardSuccess = "Nhận thưởng thành công!";
+    public static string RewardAlreadyClaimed = "Đã nhận phần thưởng";
 
 
 }

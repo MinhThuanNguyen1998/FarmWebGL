@@ -19,5 +19,6 @@ public class BootstrapInstaller : MonoInstaller
         // Signals
         Container.DeclareSignal <UserDataLoadedSignal>();
         Container.DeclareSignal<InventoryLoadedSignal>();
+        Container.DeclareSignal<RewardClaimedSignal>();
     }
 }

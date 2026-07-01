@@ -66,16 +66,15 @@ public class UserDataService
     public async UniTask<bool> ClaimRewardAsync()
     {
         var (networkSuccess, response) = await m_NetworkService
-         .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_CLAIM_REWARD, new { });
+        .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_CLAIM_REWARD, new { });
         if (!networkSuccess || response == null || !response.status || response.data == null)
         {
-            string errorMsg = response == null ? "no/invalid response" : response.message;
-            Debug.LogError($"[UserDataService] ClaimRewardAsync failed: {errorMsg}");
+            m_SignalBus.Fire(new RewardClaimedSignal(false, response?.message ?? "Network Error"));
             return false;
         }
         if (!response.data.can_claim)
         {
-            Debug.LogWarning("[UserDataService] Reward already claimed today.");
+            m_SignalBus.Fire(new RewardClaimedSignal(false, response.message ?? "Already claimed today"));
             return false;
         }
         if (Data?.userInfo != null && !string.IsNullOrEmpty(response.data.total_amount_user))
@@ -83,7 +82,7 @@ public class UserDataService
             Data.userInfo.amount = response.data.total_amount_user;
         }
 
-        m_SignalBus.Fire(new RewardClaimedSignal(response.data));
+        m_SignalBus.Fire(new RewardClaimedSignal(true, "Success", response.data));
         return true;
     }
 
