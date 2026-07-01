@@ -59,14 +59,30 @@ public class UserDataService
         if (await m_NetworkService.SendPostRequestAsync(ApiConfig.API_ADD_ANIMAL_URL, requestBody))
         {
             Debug.Log($"Successfully added animal: '{groupName}'");
-            return await LoadAllDataAsync() == LoadDataResult.Success;
+            return await LoadAnimalAsync();
         }
+        return false;
+    }
+    public async UniTask<bool> LoadAnimalAsync()
+    {
+        var (result, response) = await m_NetworkService.SendGetRequestAsync<ApiLoadAnimalResponse>(ApiConfig.API_GET_LOAD_ANIMAL_URL);
+
+        if (result == LoadDataResult.Success && response != null && response.success)
+        {
+            if (Data == null)
+                Data = new UserData();
+
+            Data.farm = response.data ?? new System.Collections.Generic.List<FarmAnimal>();
+            m_SignalBus.Fire(new UserDataLoadedSignal(Data));
+            return true;
+        }
+        Debug.LogError($"[UserDataService] Failed to load animal list. Result: {result}, Message: {response?.message}");
         return false;
     }
     public async UniTask<bool> ClaimRewardAsync()
     {
         var (networkSuccess, response) = await m_NetworkService
-        .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_CLAIM_REWARD, new { });
+        .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_POST_CLAIM_REWARD, new { });
         if (!networkSuccess || response == null || !response.status || response.data == null)
         {
             m_SignalBus.Fire(new RewardClaimedSignal(false, response?.message ?? "Network Error"));

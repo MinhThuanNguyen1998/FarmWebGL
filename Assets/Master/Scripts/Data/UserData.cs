@@ -10,6 +10,13 @@ public class ApiUserDataResponse
     public string message;
     public ApiUserDataContent data;
 }
+[Serializable]
+public class ApiLoadAnimalResponse
+{
+    public bool success;
+    public string message;
+    public List<FarmAnimal> data;
+}
 
 [Serializable]
 public class ApiUserDataContent
@@ -64,23 +71,5 @@ public class UserData
         return 0;
     }
 
-    public double GetBalance()
-    {
-        return double.TryParse(userInfo?.amount,
-            System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture,
-            out double val) ? val : 0;
-    }
-    public Dictionary<string, List<FarmAnimal>> GetAnimalGroups()
-    {
-        var groups = new Dictionary<string, List<FarmAnimal>>();
-        if (farm == null) return groups;
-        foreach (var animal in farm)
-        {
-            if (!groups.ContainsKey(animal.animal_name))
-                groups[animal.animal_name] = new List<FarmAnimal>();
-            groups[animal.animal_name].Add(animal);
-        }
-        return groups;
-    }
+   
 }

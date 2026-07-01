@@ -16,11 +16,13 @@ public class UIPopupOpener : MonoBehaviour
     private void OnEnable()
     {
         m_SignalBus.Subscribe<RewardClaimedSignal>(OnReward);
+        m_SignalBus.Subscribe<AddAnimalResultSignal>(OnAddAnimalResult);
     }
 
     private void OnDisable()
     {
         m_SignalBus.TryUnsubscribe<RewardClaimedSignal>(OnReward);
+        m_SignalBus.TryUnsubscribe<AddAnimalResultSignal>(OnAddAnimalResult);
     }
 
     
@@ -36,6 +38,15 @@ public class UIPopupOpener : MonoBehaviour
         {
             data.content = Config.RewardAlreadyClaimed;
         }
+
+        m_PopupManager.ShowPopup(m_PopupReward, data);
+    }
+
+    public void OnAddAnimalResult(AddAnimalResultSignal signal)
+    {
+        RewardPopupData data = new RewardPopupData();
+
+        data.content = signal.IsSuccess ? Config.AddAnimalSuccess : Config.AddAnimalFailed;
 
         m_PopupManager.ShowPopup(m_PopupReward, data);
     }

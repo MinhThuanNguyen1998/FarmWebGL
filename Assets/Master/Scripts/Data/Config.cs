@@ -24,8 +24,10 @@ public static class Config
 
     // Reward
     public static string RewardSuccess = "Nhận thưởng thành công!";
-    public static string RewardAlreadyClaimed = "Đã nhận phần thưởng";
+    public static string RewardAlreadyClaimed = "Hôm nay đã nhận thưởng rồi";
 
-
+    // Add Animal
+    public static string AddAnimalSuccess = "Thêm con vật thành công";
+    public static string AddAnimalFailed = "Thêm con vật thất bại";
 }
 

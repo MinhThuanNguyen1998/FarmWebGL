@@ -15,13 +15,22 @@ public static class ApiConfig
     public static string API_INVENTORY_URL = "https://homagame.com/api/inventory";
     public static string API_CLAIM_REWARD_URL = "https://homagame.com/api/daily-reward";
 
+    public static string API_ADD_ANIMAL_URL = "https://homagame.com/api/farm/add-animal";
+    public static string API_LOAD_ANIMAL_URL = "https://homagame.com/api/barn/load-animal";
 
 
+    // Auth API
     public static string API_GET_USER_DATA_URL => API_DATA_URL;
-    public static string API_ADD_ANIMAL_URL => API_DATA_URL;
+
+    // Inventory API
     public static string API_GET_INVENTORY_URL => API_INVENTORY_URL;
 
-    public static string API_CLAIM_REWARD => API_CLAIM_REWARD_URL;
+    // Claim Reward API
+    public static string API_POST_CLAIM_REWARD => API_CLAIM_REWARD_URL;
+
+    // Animal API
+    public static string API_POST_ADD_ANIMAL_URL => API_ADD_ANIMAL_URL;
+    public static string API_GET_LOAD_ANIMAL_URL => API_LOAD_ANIMAL_URL;
 }
 
 
