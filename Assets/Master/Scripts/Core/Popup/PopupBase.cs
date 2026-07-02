@@ -5,6 +5,7 @@ using Zenject;
 public class PopupBase : MonoBehaviour
 {
     [Header("Animation Settings")]
+    [SerializeField] private Transform m_AnimTarget;
     [SerializeField] private Ease m_ShowEase = Ease.OutBack;
     [SerializeField] private Ease m_HideEase = Ease.InBack;
 
@@ -12,6 +13,8 @@ public class PopupBase : MonoBehaviour
     private float m_HideDuration = 0.45f;
     private bool m_IsHiding = false;
     protected PopupManager m_PopupManager;
+
+    private Transform AnimTarget => m_AnimTarget != null ? m_AnimTarget : transform;
 
     [Inject]
     public void Construct(PopupManager popupManager)
@@ -24,10 +27,12 @@ public class PopupBase : MonoBehaviour
     public virtual void Show()
     {
         m_IsHiding = false;
-        transform.DOKill();
+
+        AnimTarget.DOKill();
+        AnimTarget.localScale = Vector3.zero;
         gameObject.SetActive(true);
-        transform.localScale = Vector3.zero;
-        transform
+
+        AnimTarget
             .DOScale(Vector3.one, m_ShowDuration)
             .SetEase(m_ShowEase)
             .SetUpdate(true);
@@ -38,8 +43,9 @@ public class PopupBase : MonoBehaviour
         if (m_IsHiding) return;
         m_IsHiding = true;
 
-        transform.DOKill();
-        transform
+        AnimTarget.DOKill();
+
+        AnimTarget
             .DOScale(Vector3.zero, m_HideDuration)
             .SetEase(m_HideEase)
             .SetUpdate(true)
@@ -58,6 +64,13 @@ public class PopupBase : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        transform.DOKill();
+        if (m_AnimTarget != null)
+        {
+            m_AnimTarget.DOKill();
+        }
+        else
+        {
+            transform.DOKill();
+        }
     }
 }

@@ -50,11 +50,14 @@ public class PopupManager
         if (m_CurrentPopup == null || !m_IsShowing) return;
 
         var popupToHide = m_CurrentPopup;
-        m_CurrentPopup = null;
-        m_IsShowing = false;
 
         popupToHide.Hide(() =>
         {
+            if (m_CurrentPopup == popupToHide)
+            {
+                m_CurrentPopup = null;
+            }
+            m_IsShowing = false;
             ShowNext();
         });
     }
