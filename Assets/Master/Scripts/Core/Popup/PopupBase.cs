@@ -59,6 +59,8 @@ public class PopupBase : MonoBehaviour
 
     public virtual void Close()
     {
+        if (m_IsHiding) return;
+
         m_PopupManager?.CloseCurrentPopup();
     }
 
