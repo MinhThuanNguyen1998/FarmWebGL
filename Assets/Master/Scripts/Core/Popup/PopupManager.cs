@@ -7,12 +7,13 @@ using Zenject;
 public class PopupManager
 {
     private readonly Queue<(PopupBase prefab, object data)> m_PopupQueue = new();
-    private readonly Dictionary<PopupBase, List<PopupBase>> m_Pool = new();
+   
+    private readonly Dictionary<string, List<PopupBase>> m_Pool = new();
     private readonly DiContainer m_Container;
     private readonly Transform m_CanvasRoot;
 
     private PopupBase m_CurrentPopup;
-    private bool m_IsShowing;
+    private bool m_IsTransitioning;
 
     public PopupManager(DiContainer container, Transform canvasRootPopup)
     {
@@ -24,55 +25,59 @@ public class PopupManager
     {
         if (prefab == null) return;
         m_PopupQueue.Enqueue((prefab, data));
-        if (!m_IsShowing) ShowNext();
+
+        if (m_CurrentPopup == null && !m_IsTransitioning)
+        {
+            ShowNext();
+        }
     }
 
     private void ShowNext()
     {
-        while (m_PopupQueue.Count > 0)
-        {
-            var (prefab, data) = m_PopupQueue.Dequeue();
-            if (prefab == null) continue;
+        if (m_PopupQueue.Count == 0) return;
 
-            m_IsShowing = true;
-            m_CurrentPopup = GetPopupFromPool(prefab);
-            m_CurrentPopup.transform.SetAsLastSibling();
+        var (prefab, data) = m_PopupQueue.Dequeue();
+        if (prefab == null) return;
 
-            m_CurrentPopup.Setup(data);
-            m_CurrentPopup.Show();
-            return;
-        }
-        m_IsShowing = false;
+        m_IsTransitioning = true;
+        m_CurrentPopup = GetPopupFromPool(prefab);
+        m_CurrentPopup.transform.SetAsLastSibling();
+
+        m_CurrentPopup.Setup(data);
+        m_CurrentPopup.Show();
+
+        m_IsTransitioning = false;
     }
 
     public void CloseCurrentPopup()
     {
-        if (m_CurrentPopup == null || !m_IsShowing) return;
+        if (m_CurrentPopup == null || m_IsTransitioning) return;
 
+        m_IsTransitioning = true;
         var popupToHide = m_CurrentPopup;
+        m_CurrentPopup = null;
 
         popupToHide.Hide(() =>
         {
-            if (m_CurrentPopup == popupToHide)
-            {
-                m_CurrentPopup = null;
-            }
-            m_IsShowing = false;
+            m_IsTransitioning = false;
             ShowNext();
         });
     }
 
     private PopupBase GetPopupFromPool(PopupBase prefab)
     {
-        if (!m_Pool.TryGetValue(prefab, out var list))
+        string key = prefab.name;
+        if (!m_Pool.TryGetValue(key, out var list))
         {
-            list = m_Pool[prefab] = new List<PopupBase>();
+            list = m_Pool[key] = new List<PopupBase>();
         }
-
-        list.RemoveAll(item => item == null);
-        var pooledPopup = list.FirstOrDefault(p => !p.gameObject.activeSelf);
-
-        if (pooledPopup != null) return pooledPopup;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i] != null && !list[i].gameObject.activeSelf)
+            {
+                return list[i];
+            }
+        }
 
         var popupObj = m_Container.InstantiatePrefab(prefab.gameObject, m_CanvasRoot);
         var newPopup = popupObj.GetComponent<PopupBase>();
@@ -106,7 +111,7 @@ public class PopupManager
         if (forceDestroyActive || m_CurrentPopup == null)
         {
             m_CurrentPopup = null;
-            m_IsShowing = false;
+            m_IsTransitioning = false;
         }
     }
 }
