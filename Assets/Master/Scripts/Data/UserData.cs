@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,9 +56,9 @@ public class UserData
 {
     public UserInfo userInfo;
     public List<FarmAnimal> farm;
-    public long money => ParseMoney(userInfo?.amount);
+    public double money => ParseMoney(userInfo?.amount);
 
-    private static long ParseMoney(string raw)
+    private static double ParseMoney(string raw)
     {
         if (string.IsNullOrEmpty(raw)) return 0;
         if (double.TryParse(raw,
@@ -66,10 +66,10 @@ public class UserData
             System.Globalization.CultureInfo.InvariantCulture,
             out double val))
         {
-            return (long)val;
+            return val;
         }
         return 0;
     }
 
-   
+
 }

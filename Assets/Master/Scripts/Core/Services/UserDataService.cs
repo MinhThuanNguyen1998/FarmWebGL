@@ -83,23 +83,35 @@ public class UserDataService
     {
         var (networkSuccess, response) = await m_NetworkService
         .SendAuthPostAsync<object, ApiRewardResponse>(ApiConfig.API_POST_CLAIM_REWARD, new { });
-        if (!networkSuccess || response == null || !response.status || response.data == null)
+
+        // 1. Server error or network error
+        if (!networkSuccess || response == null)
         {
-            m_SignalBus.Fire(new RewardClaimedSignal(false, response?.message ?? "Network Error"));
+            m_SignalBus.Fire(new RewardClaimedSignal(false, "Network Error"));
             return false;
         }
-        if (!response.data.can_claim)
+
+        // 2. status == true 
+        if (response.status)
+        {
+            if (response.data != null)
+            {
+                if (Data != null && Data.userInfo != null)
+                {
+                    Data.userInfo.amount = response.data.total_amount_user;
+                }
+                m_SignalBus.Fire(new RewardClaimedSignal(true, "Success", response.data));
+                return true;
+            }
+        }
+        // 3. status = false
+        else
         {
             m_SignalBus.Fire(new RewardClaimedSignal(false, response.message ?? "Already claimed today"));
             return false;
         }
-        if (Data?.userInfo != null && !string.IsNullOrEmpty(response.data.total_amount_user))
-        {
-            Data.userInfo.amount = response.data.total_amount_user;
-        }
 
-        m_SignalBus.Fire(new RewardClaimedSignal(true, "Success", response.data));
-        return true;
+        return false;
     }
 
     public void ResetData()
