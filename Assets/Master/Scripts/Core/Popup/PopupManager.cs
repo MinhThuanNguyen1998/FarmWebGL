@@ -55,10 +55,10 @@ public class PopupManager
 
         m_IsTransitioning = true;
         var popupToHide = m_CurrentPopup;
-        m_CurrentPopup = null;
 
         popupToHide.Hide(() =>
         {
+            m_CurrentPopup = null;
             m_IsTransitioning = false;
             ShowNext();
         });
