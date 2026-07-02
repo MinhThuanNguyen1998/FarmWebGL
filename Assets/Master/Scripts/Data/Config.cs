@@ -25,6 +25,7 @@ public static class Config
     // Reward
     public static string RewardSuccess = "Nhận thưởng thành công!";
     public static string RewardAlreadyClaimed = "Hôm nay đã nhận thưởng rồi";
+    public static string RewardFailed = "Nhận thưởng thất bại do lỗi \nhệ thống";
 
     // Add Animal
     public static string AddAnimalSuccess = "Thêm con vật thành công";

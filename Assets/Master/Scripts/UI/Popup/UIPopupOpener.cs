@@ -36,9 +36,16 @@ public class UIPopupOpener : MonoBehaviour
         }
         else
         {
-            data.content = Config.RewardAlreadyClaimed;
+            if (signal.Message == "Network Error")
+            {
+                data.content = Config.RewardFailed;
+            }
+            else
+            {
+                data.content = Config.RewardAlreadyClaimed;
+            }
         }
-
+       
         m_PopupManager.ShowPopup(m_Popup, data);
     }
 

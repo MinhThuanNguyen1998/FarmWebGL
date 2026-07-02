@@ -56,7 +56,7 @@ public class UserDataService
     public async UniTask<bool> AddAnimalAsync(string groupName)
     {
         var requestBody = new AddAnimalRequest { groupName = groupName };
-        if (await m_NetworkService.SendPostRequestAsync(ApiConfig.API_ADD_ANIMAL_URL, requestBody))
+        if (await m_NetworkService.SendAuthPostStatusAsync(ApiConfig.API_ADD_ANIMAL_URL, requestBody))
         {
             Debug.Log($"Successfully added animal: '{groupName}'");
             return await LoadAnimalAsync();
@@ -82,7 +82,7 @@ public class UserDataService
     public async UniTask<bool> ClaimRewardAsync()
     {
         var (networkSuccess, response) = await m_NetworkService
-        .SendAuthenticatedPostRequestAsync<object, ApiRewardResponse>(ApiConfig.API_POST_CLAIM_REWARD, new { });
+        .SendAuthPostAsync<object, ApiRewardResponse>(ApiConfig.API_POST_CLAIM_REWARD, new { });
         if (!networkSuccess || response == null || !response.status || response.data == null)
         {
             m_SignalBus.Fire(new RewardClaimedSignal(false, response?.message ?? "Network Error"));

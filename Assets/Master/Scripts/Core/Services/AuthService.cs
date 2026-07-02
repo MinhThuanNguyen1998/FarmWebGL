@@ -50,7 +50,7 @@ public class AuthService
         try
         {
             var requestBody = new LoginRequest { username = username, password = password };
-            var (networkSuccess, response) = await m_NetworkService.SendPublicPostRequestAsync<LoginRequest, TokenResponse>(
+            var (networkSuccess, response) = await m_NetworkService.SendPostAsync<LoginRequest, TokenResponse>(
                 ApiConfig.API_AUTH_URL, requestBody);
 
             // Server Error

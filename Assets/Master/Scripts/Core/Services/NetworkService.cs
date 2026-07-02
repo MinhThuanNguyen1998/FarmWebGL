@@ -79,16 +79,20 @@ public class NetworkService
         }
     }
 
-    public async UniTask<bool> SendPostRequestAsync<TRequest>(string url, TRequest body)
+    //Sends an authenticated POST request and only returns the success status
+    public async UniTask<bool> SendAuthPostStatusAsync<TRequest>(string url, TRequest body) 
     {
         using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
         try { await request.SendWebRequest().ToUniTask(); } catch { }
         return request.result == UnityWebRequest.Result.Success;
     }
 
-    public UniTask<(bool networkSuccess, TResponse responseData)> SendAuthenticatedPostRequestAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
+    // Sends a POST request with Token
+    public UniTask<(bool networkSuccess, TResponse responseData)> SendAuthPostAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
         => SendPostCoreAsync<TRequest, TResponse>(url, body, isAuthenticated: true);
-    public UniTask<(bool networkSuccess, TResponse responseData)> SendPublicPostRequestAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
+
+    //Sends a POST request WITHOUT Token
+    public UniTask<(bool networkSuccess, TResponse responseData)> SendPostAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
         => SendPostCoreAsync<TRequest, TResponse>(url, body, isAuthenticated: false);
 
     private void LogNetworkError(string method, UnityWebRequest request)
