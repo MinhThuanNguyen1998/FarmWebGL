@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
@@ -55,7 +56,7 @@ public class UserDataService
 
     public async UniTask<bool> AddAnimalAsync(string groupName)
     {
-        var requestBody = new AddAnimalRequest { groupName = groupName };
+        var requestBody = new AddAnimalRequest { animal_name = groupName };
         if (await m_NetworkService.SendAuthPostStatusAsync(ApiConfig.API_ADD_ANIMAL_URL, requestBody))
         {
             Debug.Log($"Successfully added animal: '{groupName}'");
@@ -72,7 +73,7 @@ public class UserDataService
             if (Data == null)
                 Data = new UserData();
 
-            Data.farm = response.data ?? new System.Collections.Generic.List<FarmAnimal>();
+            Data.farm = response.data?.farm ?? new List<FarmAnimal>();
             m_SignalBus.Fire(new UserDataLoadedSignal(Data));
             return true;
         }
@@ -121,5 +122,5 @@ public class UserDataService
         m_InventoryService.ResetData();
     }
 
-    [Serializable] private class AddAnimalRequest { public string groupName; }
+    [Serializable] public class AddAnimalRequest { public string animal_name; }
 }

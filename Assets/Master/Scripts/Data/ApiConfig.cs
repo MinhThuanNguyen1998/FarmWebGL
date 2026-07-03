@@ -15,7 +15,7 @@ public static class ApiConfig
     public static string API_INVENTORY_URL = "https://homagame.com/api/inventory";
     public static string API_CLAIM_REWARD_URL = "https://homagame.com/api/daily-reward";
 
-    public static string API_ADD_ANIMAL_URL = "https://homagame.com/api/farm/add-animal";
+    public static string API_ADD_ANIMAL_URL = "https://homagame.com/api/barn/add-animal";
     public static string API_LOAD_ANIMAL_URL = "https://homagame.com/api/barn/load-animal";
 
 

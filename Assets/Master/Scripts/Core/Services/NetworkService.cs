@@ -24,6 +24,13 @@ public class NetworkService
             request.uploadHandler = new UploadHandlerRaw(form.data);
             foreach (var header in form.headers) request.SetRequestHeader(header.Key, header.Value);
         }
+        else if (body is UserDataService.AddAnimalRequest addAnimalData)
+        {
+            var form = new WWWForm();
+            form.AddField("animal_name", addAnimalData.animal_name);
+            request.uploadHandler = new UploadHandlerRaw(form.data);
+            foreach (var header in form.headers) request.SetRequestHeader(header.Key, header.Value);
+        }
         else
         {
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(body));
