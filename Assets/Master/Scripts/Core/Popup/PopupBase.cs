@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using Zenject;
 
@@ -9,7 +10,7 @@ public class PopupBase : MonoBehaviour
     [SerializeField] private Ease m_ShowEase = Ease.OutBack;
     [SerializeField] private Ease m_HideEase = Ease.InBack;
 
-    private float m_ShowDuration = 0.55f;
+    private float m_ShowDuration = 0.45f;
     private float m_HideDuration = 0.45f;
     private bool m_IsHiding = false;
     protected PopupManager m_PopupManager;
@@ -24,7 +25,7 @@ public class PopupBase : MonoBehaviour
 
     public virtual void Setup(object data) { }
 
-    public virtual void Show()
+    public virtual async UniTask ShowAsync()
     {
         m_IsHiding = false;
 
@@ -32,47 +33,39 @@ public class PopupBase : MonoBehaviour
         AnimTarget.localScale = Vector3.zero;
         gameObject.SetActive(true);
 
-        AnimTarget
+        await AnimTarget
             .DOScale(Vector3.one, m_ShowDuration)
             .SetEase(m_ShowEase)
-            .SetUpdate(true);
+            .SetUpdate(true)
+            .ToUniTask(TweenCancelBehaviour.Complete, this.GetCancellationTokenOnDestroy());
     }
 
-    public virtual void Hide(System.Action onHideComplete = null)
+    public virtual async UniTask HideAsync()
     {
         if (m_IsHiding) return;
         m_IsHiding = true;
 
         AnimTarget.DOKill();
 
-        AnimTarget
+        await AnimTarget
             .DOScale(Vector3.zero, m_HideDuration)
             .SetEase(m_HideEase)
             .SetUpdate(true)
-            .OnComplete(() =>
-            {
-                gameObject.SetActive(false);
-                m_IsHiding = false;
-                onHideComplete?.Invoke();
-            });
+            .ToUniTask(TweenCancelBehaviour.Complete, this.GetCancellationTokenOnDestroy());
+
+        gameObject.SetActive(false);
+        m_IsHiding = false;
     }
 
     public virtual void Close()
     {
         if (m_IsHiding) return;
-
         m_PopupManager?.CloseCurrentPopup();
     }
 
     protected virtual void OnDestroy()
     {
-        if (m_AnimTarget != null)
-        {
-            m_AnimTarget.DOKill();
-        }
-        else
-        {
-            transform.DOKill();
-        }
+        if (m_AnimTarget != null) m_AnimTarget.DOKill();
+        else transform.DOKill();
     }
 }

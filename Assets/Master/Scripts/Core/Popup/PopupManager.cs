@@ -6,8 +6,6 @@ using Zenject;
 
 public class PopupManager
 {
-    private readonly Queue<(PopupBase prefab, object data)> m_PopupQueue = new();
-   
     private readonly Dictionary<string, List<PopupBase>> m_Pool = new();
     private readonly DiContainer m_Container;
     private readonly Transform m_CanvasRoot;
@@ -23,45 +21,43 @@ public class PopupManager
 
     public void ShowPopup(PopupBase prefab, object data = null)
     {
-        if (prefab == null) return;
-        m_PopupQueue.Enqueue((prefab, data));
+        if (prefab == null || m_IsTransitioning) return;
 
-        if (m_CurrentPopup == null && !m_IsTransitioning)
+        if (m_CurrentPopup != null)
         {
-            ShowNext();
+            CloseCurrentPopup();
         }
+
+        ShowPopupAsync(prefab, data).Forget();
     }
 
-    private void ShowNext()
+    private async UniTaskVoid ShowPopupAsync(PopupBase prefab, object data)
     {
-        if (m_PopupQueue.Count == 0) return;
-
-        var (prefab, data) = m_PopupQueue.Dequeue();
-        if (prefab == null) return;
-
         m_IsTransitioning = true;
+
         m_CurrentPopup = GetPopupFromPool(prefab);
         m_CurrentPopup.transform.SetAsLastSibling();
 
         m_CurrentPopup.Setup(data);
-        m_CurrentPopup.Show();
+
+        
+        await m_CurrentPopup.ShowAsync();
 
         m_IsTransitioning = false;
     }
 
-    public void CloseCurrentPopup()
+    public async void CloseCurrentPopup()
     {
         if (m_CurrentPopup == null || m_IsTransitioning) return;
 
         m_IsTransitioning = true;
         var popupToHide = m_CurrentPopup;
 
-        popupToHide.Hide(() =>
-        {
-            m_CurrentPopup = null;
-            m_IsTransitioning = false;
-            ShowNext();
-        });
+        await popupToHide.HideAsync();
+
+        m_CurrentPopup = null;
+        m_IsTransitioning = false;
+
     }
 
     private PopupBase GetPopupFromPool(PopupBase prefab)
@@ -87,7 +83,6 @@ public class PopupManager
 
     public void ClearPool(bool forceDestroyActive = false)
     {
-        m_PopupQueue.Clear();
 
         foreach (var (prefab, list) in m_Pool.ToList())
         {
