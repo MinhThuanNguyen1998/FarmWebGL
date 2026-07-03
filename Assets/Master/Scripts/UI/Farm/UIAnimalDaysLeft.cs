@@ -37,7 +37,7 @@ public class UIAnimalDaysLeft : MonoBehaviour
     {
         if (m_DaysLeftText != null)
         {
-            m_DaysLeftText.text = Config.Days_Left_First+ farmAnimal.remaining_days.ToString() + Config.Days_Left_Last;
+            m_DaysLeftText.text = farmAnimal.remaining_days.ToString();
         }
         else
         {
