@@ -1051,6 +1051,7 @@ GameObject:
   - component: {fileID: 888538744}
   - component: {fileID: 888538743}
   - component: {fileID: 888538742}
+  - component: {fileID: 888538745}
   m_Layer: 5
   m_Name: InputField (TMP) (1)
   m_TagString: Untagged
@@ -1214,6 +1215,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 888538740}
   m_CullTransparentMesh: 1
+--- !u!114 &888538745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888538740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: -1
+  blurBlock: 0
+  showHtmlElement: 0
 --- !u!1001 &978197795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1323,8 +1339,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -1504816276820746735, guid: a7d0869c155114c409e8489099b0a013, type: 2}
+    - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1778,6 +1802,7 @@ GameObject:
   - component: {fileID: 1890677228}
   - component: {fileID: 1890677227}
   - component: {fileID: 1890677226}
+  - component: {fileID: 1890677229}
   m_Layer: 5
   m_Name: InputField (TMP)
   m_TagString: Untagged
@@ -1941,6 +1966,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890677224}
   m_CullTransparentMesh: 1
+--- !u!114 &1890677229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890677224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: -1
+  blurBlock: 0
+  showHtmlElement: 0
 --- !u!1 &1926220396
 GameObject:
   m_ObjectHideFlags: 0
