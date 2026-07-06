@@ -184,7 +184,7 @@ GameObject:
   - component: {fileID: 8968739942684238806}
   - component: {fileID: 1277757260495992165}
   m_Layer: 5
-  m_Name: Popup
+  m_Name: Popup_Notification
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -541,7 +541,7 @@ PrefabInstance:
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: -1504816276820746735, guid: a7d0869c155114c409e8489099b0a013, type: 2}
+      objectReference: {fileID: 3547904688905080083, guid: 755498f8c6252f34389dcf28f6248114, type: 2}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0

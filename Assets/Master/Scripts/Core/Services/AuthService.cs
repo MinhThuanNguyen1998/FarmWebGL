@@ -45,6 +45,12 @@ public class AuthService
         public LoginDataContent data;
     }
 
+    [Serializable]
+    public class LogoutResponse
+    {
+        public bool success;
+        public string message;
+    }
     public async UniTask<AuthResult> LoginAsync(string username, string password)
     {
         try
@@ -72,4 +78,23 @@ public class AuthService
             return new AuthResult { IsSuccess = false, ErrorMessage = Config.ServerError };
         }
     }
+    public async UniTask<bool> LogoutAsync()
+    {
+        bool isSuccess = false;
+        try
+        {
+            isSuccess = await m_NetworkService.SendAuthPostStatusAsync(ApiConfig.API_POST_LOGOUT_URL, new object());
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[AuthService] Logout failed: {ex.Message}");
+        }
+        finally
+        {
+            TokenManager.ClearTokens();
+        }
+
+        return isSuccess;
+    }
 }
+

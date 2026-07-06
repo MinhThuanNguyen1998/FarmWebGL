@@ -19,7 +19,7 @@ public class UITabManager : MonoBehaviour
     private Color m_InactiveColor;
     private void Awake()
     {
-        ColorUtility.TryParseHtmlString("#AD7B35", out m_ActiveColor);
+        ColorUtility.TryParseHtmlString("#D2A9E7", out m_ActiveColor);
         ColorUtility.TryParseHtmlString("#EED8B9", out m_InactiveColor);
     }
     private void Start()

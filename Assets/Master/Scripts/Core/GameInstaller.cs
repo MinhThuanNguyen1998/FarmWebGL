@@ -25,6 +25,7 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<AddAnimalSignal>();
         Container.DeclareSignal<AddAnimalResultSignal>();
         Container.DeclareSignal<BossChallengeClickedSignal>();
+        Container.DeclareSignal<LogoutRequestSignal>();
 
         // Pet item pool — initial size 5, expand as needed
         Container.BindMemoryPool<UIPetItem, UIPetItem.Pool>()

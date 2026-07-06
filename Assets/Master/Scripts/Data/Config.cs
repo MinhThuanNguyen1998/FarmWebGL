@@ -28,5 +28,8 @@ public static class Config
 
     // Boss Challenge
     public static string BossChallengeComingSoon = "Coming soon...";
+
+    // Logout
+    public static string Logout = "Do you want to return to \nthe login screen?";
 }
 

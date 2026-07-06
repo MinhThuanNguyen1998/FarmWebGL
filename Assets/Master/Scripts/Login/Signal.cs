@@ -85,3 +85,6 @@ public class RewardClaimedSignal
 // Boss Challenge signals
 public struct BossChallengeClickedSignal { }
 
+// Logout signals
+public struct LogoutRequestSignal { }
+

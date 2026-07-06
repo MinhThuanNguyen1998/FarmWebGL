@@ -7,7 +7,8 @@ using Zenject;
 public class UIPopupOpener : MonoBehaviour
 {
     [Header("PrefabPopup")]
-    [SerializeField] private PopupBase m_Popup;
+    [SerializeField] private PopupBase m_NotificationPopup;
+    [SerializeField] private PopupBase m_LogoutPopup;
 
     [Inject] private readonly PopupManager m_PopupManager;
     [Inject] private readonly SignalBus m_SignalBus;
@@ -18,6 +19,7 @@ public class UIPopupOpener : MonoBehaviour
         m_SignalBus.Subscribe<RewardClaimedSignal>(OnReward);
         m_SignalBus.Subscribe<AddAnimalResultSignal>(OnAddAnimalResult);
         m_SignalBus.Subscribe<BossChallengeClickedSignal>(OnBossChallengeClicked);
+        m_SignalBus.Subscribe<LogoutRequestSignal>(OnLogOutClicked);
     }
 
     private void OnDisable()
@@ -25,9 +27,10 @@ public class UIPopupOpener : MonoBehaviour
         m_SignalBus.TryUnsubscribe<RewardClaimedSignal>(OnReward);
         m_SignalBus.TryUnsubscribe<AddAnimalResultSignal>(OnAddAnimalResult);
         m_SignalBus.TryUnsubscribe<BossChallengeClickedSignal>(OnBossChallengeClicked);
+        m_SignalBus.TryUnsubscribe<LogoutRequestSignal>(OnLogOutClicked);
     }
 
-    
+
     public void OnReward(RewardClaimedSignal signal)
     {
         RewardPopupData data = new RewardPopupData();
@@ -48,7 +51,7 @@ public class UIPopupOpener : MonoBehaviour
             }
         }
        
-        m_PopupManager.ShowPopup(m_Popup, data);
+        m_PopupManager.ShowPopup(m_NotificationPopup, data);
     }
 
     public void OnAddAnimalResult(AddAnimalResultSignal signal)
@@ -57,13 +60,25 @@ public class UIPopupOpener : MonoBehaviour
 
         data.content = signal.IsSuccess ? Config.AddAnimalSuccess : Config.AddAnimalFailed;
 
-        m_PopupManager.ShowPopup(m_Popup, data);
+        m_PopupManager.ShowPopup(m_NotificationPopup, data);
     }
     public void OnBossChallengeClicked(BossChallengeClickedSignal signal)
     {
         RewardPopupData data = new RewardPopupData();
         data.content = Config.BossChallengeComingSoon;
 
-        m_PopupManager.ShowPopup(m_Popup, data);
+        m_PopupManager.ShowPopup(m_NotificationPopup, data);
     }
+
+    public void OnLogOutClicked()
+    {
+        LogoutPopupData data = new LogoutPopupData
+        {
+            content = Config.Logout
+        };
+
+        m_PopupManager.ShowPopup(m_LogoutPopup, data);
+    }
+
+
 }

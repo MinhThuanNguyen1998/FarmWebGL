@@ -6,3 +6,8 @@ public class RewardPopupData
 {
     public string content;
 }
+
+public class LogoutPopupData
+{
+    public string content;
+}
