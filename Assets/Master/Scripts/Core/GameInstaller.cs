@@ -25,7 +25,11 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<AddAnimalSignal>();
         Container.DeclareSignal<AddAnimalResultSignal>();
         Container.DeclareSignal<BossChallengeClickedSignal>();
+
         Container.DeclareSignal<LogoutRequestSignal>();
+        Container.DeclareSignal<LogoutConfirmedSignal>();
+
+        Container.DeclareSignal<RewardRequestSignal>();
 
         // Pet item pool — initial size 5, expand as needed
         Container.BindMemoryPool<UIPetItem, UIPetItem.Pool>()
@@ -59,8 +63,14 @@ public class GameInstaller : MonoInstaller
         // Register AnimalShopHandler to handle AddAnimalSignal from UI
         Container.BindInterfacesTo<AnimalController>().AsSingle();
 
+        // Register LogoutManager to handle LogoutConfirmedSignal from UI
+        Container.BindInterfacesTo<LogOutController>().AsSingle();
+
         // Popup
         Container.Bind<PopupManager>().AsSingle().WithArguments(m_CanvasRootPopup);
+
+        // Reward
+        Container.BindInterfacesTo<RewardController>().AsSingle();
     }
 
 }

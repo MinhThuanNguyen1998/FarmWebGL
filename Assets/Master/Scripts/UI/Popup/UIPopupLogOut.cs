@@ -15,9 +15,7 @@ public class UIPopupLogOut : PopupBase
 
     private LogoutPopupData m_Data;
     private bool m_IsProcessing;
-
-    [Inject] private readonly AuthService m_AuthService;
-    [Inject] private readonly SceneLoader m_SceneLoader;
+    [Inject] private readonly SignalBus m_SignalBus;
     private void Awake()
     {
         if (m_BtnYes != null) m_BtnYes.onClick.AddListener(OnYesButtonClicked);
@@ -39,26 +37,18 @@ public class UIPopupLogOut : PopupBase
     private void OnYesButtonClicked()
     {
         if (m_IsProcessing) return;
-        ProcessLogoutAsync().Forget();
+        m_IsProcessing = true;
+        SetButtonsInteractable(false);
+
+        m_SignalBus.Fire<LogoutConfirmedSignal>(); // fire signal to LogOutManager
+        Close();
     }
     private void OnNoButtonClicked()
     {
         if (m_IsProcessing) return;
         Close();
     }
-    private async UniTaskVoid ProcessLogoutAsync()
-    {
-        m_IsProcessing = true;
-        SetButtonsInteractable(false);
-
-        await m_AuthService.LogoutAsync();
-
-        await HideAsync();
-
-        await m_SceneLoader.LoadSceneWithLoadingBar(Config.Login_Scene);
-
-        m_IsProcessing = false;
-    }
+    
 
     private void SetButtonsInteractable(bool interactable)
     {

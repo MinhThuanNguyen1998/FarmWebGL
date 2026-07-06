@@ -11,6 +11,6 @@ public class UIReward : UIButtonSignalTrigger
     protected override async void OnButtonClicked()
     {
         Debug.Log("[UIReward] Player clicked Claim Reward button.");
-        await m_UserDataService.ClaimRewardAsync();
+        m_SignalBus.Fire<RewardRequestSignal>();
     }
 }

@@ -82,9 +82,11 @@ public class RewardClaimedSignal
         Data = data;
     }
 }
+public struct RewardRequestSignal { }
 // Boss Challenge signals
 public struct BossChallengeClickedSignal { }
 
 // Logout signals
 public struct LogoutRequestSignal { }
+public struct LogoutConfirmedSignal { }
 
