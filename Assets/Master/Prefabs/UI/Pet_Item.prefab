@@ -512,7 +512,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7569451338326611075, guid: d790baf113624694580b9d6efda63062, type: 3}
       propertyPath: m_text
-      value: "TH\xCAM"
+      value: Raise
       objectReference: {fileID: 0}
     - target: {fileID: 7569451338326611075, guid: d790baf113624694580b9d6efda63062, type: 3}
       propertyPath: m_fontSize
@@ -541,6 +541,10 @@ PrefabInstance:
     - target: {fileID: 7569451338326611075, guid: d790baf113624694580b9d6efda63062, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 7569451338326611075, guid: d790baf113624694580b9d6efda63062, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8202786464777414175, guid: d790baf113624694580b9d6efda63062, type: 3}
       propertyPath: m_Pivot.x
