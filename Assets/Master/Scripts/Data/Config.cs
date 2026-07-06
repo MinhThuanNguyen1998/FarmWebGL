@@ -25,5 +25,8 @@ public static class Config
     // Add Animal
     public static string AddAnimalSuccess = "Animal added successfully";
     public static string AddAnimalFailed = "Failed to add animal";
+
+    // Boss Challenge
+    public static string BossChallengeComingSoon = "Coming soon...";
 }
 

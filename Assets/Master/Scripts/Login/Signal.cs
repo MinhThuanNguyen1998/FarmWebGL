@@ -82,4 +82,6 @@ public class RewardClaimedSignal
         Data = data;
     }
 }
+// Boss Challenge signals
+public struct BossChallengeClickedSignal { }
 
