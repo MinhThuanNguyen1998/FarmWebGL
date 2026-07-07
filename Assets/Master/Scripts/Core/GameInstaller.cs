@@ -19,6 +19,9 @@ public class GameInstaller : MonoInstaller
 
     [Header("Popup")]
     [SerializeField] private Transform m_CanvasRootPopup;
+
+    [Header("Joystick")]
+    [SerializeField] private Joystick m_MovingJoystick;
     public override void InstallBindings()
     {
         // Signals
@@ -71,6 +74,9 @@ public class GameInstaller : MonoInstaller
 
         // Reward
         Container.BindInterfacesTo<RewardController>().AsSingle();
+
+        // --- BIND JOYSTICK ---
+        Container.Bind<Joystick>().FromInstance(m_MovingJoystick).AsSingle();
     }
 
 }
