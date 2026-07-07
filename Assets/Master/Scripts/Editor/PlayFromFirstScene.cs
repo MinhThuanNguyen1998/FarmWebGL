@@ -14,7 +14,7 @@ public static class PlayFromFirstScene
     {
         if (state == PlayModeStateChange.ExitingEditMode)
         {
-            EditorSceneManager.playModeStartScene = 
+            EditorSceneManager.playModeStartScene =
                 AssetDatabase.LoadAssetAtPath<SceneAsset>(
                     EditorBuildSettings.scenes[0].path
                 );
