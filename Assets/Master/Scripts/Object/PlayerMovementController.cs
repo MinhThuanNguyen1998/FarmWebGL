@@ -6,7 +6,7 @@ using Zenject;
 public class PlayerMovementController : MonoBehaviour
 {
     [Header("Joystick Integration")]
-    private Joystick m_Joystick; // <-- Xóa [SerializeField], chuyển thành private
+    private Joystick m_Joystick;
 
     [Header("Movement Settings")]
     public float m_Velocity = 5f;
@@ -42,12 +42,13 @@ public class PlayerMovementController : MonoBehaviour
 
         m_InputHorizontal = Mathf.Clamp(keyboardH + joystickH, -1f, 1f);
         m_InputVertical = Mathf.Clamp(keyboardV + joystickV, -1f, 1f);
-        // ----------------------------------------------
+       
 
-        if (m_CharacterController.isGrounded && m_Animator != null)
+       
+        if (m_Animator != null)
         {
-            float minimumSpeed = 0.9f;
-            m_Animator.SetBool("run", m_CharacterController.velocity.magnitude > minimumSpeed);
+            bool isMoving = (Mathf.Abs(m_InputHorizontal) > 0.1f || Mathf.Abs(m_InputVertical) > 0.1f);
+           m_Animator.SetBool("run", isMoving);
         }
     }
 
