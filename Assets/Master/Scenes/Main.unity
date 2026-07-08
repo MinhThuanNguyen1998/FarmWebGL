@@ -2507,6 +2507,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Status_Text
       objectReference: {fileID: 0}
+    - target: {fileID: 1681241378332833234, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2832995770719599038, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2589,11 +2593,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_text
-      value: Logout
+      value: LOG OUT
       objectReference: {fileID: 0}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_fontSize
-      value: 28
+      value: 29
       objectReference: {fileID: 0}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_fontStyle
@@ -2613,7 +2617,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_fontSizeBase
-      value: 28
+      value: 29
       objectReference: {fileID: 0}
     - target: {fileID: 2940525335513134488, guid: bdea692b021ef7247ba3bf40f6b8494a, type: 3}
       propertyPath: m_sharedMaterial
@@ -7174,6 +7178,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -5631189763476694412, guid: bc6c02810d0555d438cb57b4523a1e88, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: eaacb5eb9d6ea3e43af40fc4a7cd8dbb, type: 2}
     - target: {fileID: 919132149155446097, guid: bc6c02810d0555d438cb57b4523a1e88, type: 3}
       propertyPath: m_Name
       value: Player
