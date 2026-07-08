@@ -16829,6 +16829,7 @@ GameObject:
   - component: {fileID: 5860843885085030465}
   - component: {fileID: 4867506848769015043}
   - component: {fileID: 8414012266951493641}
+  - component: {fileID: 8414012266951493642}
   m_Layer: 5
   m_Name: Button_Reward
   m_TagString: Untagged
@@ -16846,6 +16847,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70656cfe8ec00a144aaa937088a121c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8414012266951493642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8414012266951493640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b9ae740ef1ecf4d836251e86caf359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8476964277581630850
