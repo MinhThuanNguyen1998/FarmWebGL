@@ -18,7 +18,7 @@ public class PlayerMovementController : MonoBehaviour
 
     [SerializeField] Animator m_Animator;
     [SerializeField] CharacterController m_CharacterController;
-
+    private bool m_WasMoving;
     [Inject]
     public void Construct(Joystick joystick)
     {
@@ -33,7 +33,6 @@ public class PlayerMovementController : MonoBehaviour
 
     void Update()
     {
-        // --- SIMULTANEOUS JOYSTICK AND WASD SUPPORT ---
         float keyboardH = Input.GetAxis("Horizontal");
         float keyboardV = Input.GetAxis("Vertical");
 
@@ -42,14 +41,25 @@ public class PlayerMovementController : MonoBehaviour
 
         m_InputHorizontal = Mathf.Clamp(keyboardH + joystickH, -1f, 1f);
         m_InputVertical = Mathf.Clamp(keyboardV + joystickV, -1f, 1f);
-       
 
-       
+        bool isMoving = (Mathf.Abs(m_InputHorizontal) > 0.1f || Mathf.Abs(m_InputVertical) > 0.1f);
+
         if (m_Animator != null)
         {
-            bool isMoving = (Mathf.Abs(m_InputHorizontal) > 0.1f || Mathf.Abs(m_InputVertical) > 0.1f);
-           m_Animator.SetBool("run", isMoving);
+            m_Animator.SetBool("run", isMoving);
         }
+
+        // --- Xử lý âm thanh chạy ---
+        if (isMoving && !m_WasMoving)
+        {
+            AudioManager.Instance.PlayLoopingSFX(SoundType.Move);
+        }
+        else if (!isMoving && m_WasMoving)
+        {
+            AudioManager.Instance.StopLoopingSFX();
+        }
+
+        m_WasMoving = isMoving;
     }
 
     private void FixedUpdate()

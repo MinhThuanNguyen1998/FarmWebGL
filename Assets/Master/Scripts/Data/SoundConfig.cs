@@ -16,6 +16,9 @@ public enum SoundType
     Cat = 1000,
     Chicken = 1001,
 
+    // Player
+    Move = 10000
+
 
 }
 

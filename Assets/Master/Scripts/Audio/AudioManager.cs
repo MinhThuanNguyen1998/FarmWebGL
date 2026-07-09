@@ -7,6 +7,7 @@ public class AudioManager : Singleton<AudioManager>
 {
     [SerializeField] private AudioSource m_MusicSource;
     [SerializeField] private AudioSource m_SFXSource;
+    [SerializeField] private AudioSource m_LoopSFXSource;
     [SerializeField] private List<SoundData> m_SoundsList;
 
    
@@ -54,6 +55,28 @@ public class AudioManager : Singleton<AudioManager>
     }
 
     public void StopMusic() => m_MusicSource.Stop();
+    public void PlayLoopingSFX(SoundType type)
+    {
+        if (!m_SoundDict.TryGetValue(type, out var clip))
+        {
+            Debug.LogWarning($"[AudioManager] Loop SFX not found for: {type}");
+            return;
+        }
+
+        if (m_LoopSFXSource.clip == clip && m_LoopSFXSource.isPlaying)
+            return;
+
+        m_LoopSFXSource.clip = clip;
+        m_LoopSFXSource.loop = true;
+        m_LoopSFXSource.Play();
+    }
+
+    public void StopLoopingSFX()
+    {
+        if (m_LoopSFXSource.isPlaying)
+            m_LoopSFXSource.Stop();
+    }
+
 
     public void SetMusicVolume(float value)
     {
