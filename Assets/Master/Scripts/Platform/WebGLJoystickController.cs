@@ -28,7 +28,7 @@ public class JoystickPlatformTester : MonoBehaviour
             return;
         }
 
-        // 1. If running inside the Unity Editor (Development Environment)
+        // 1. Running inside the Unity Editor
         if (Application.isEditor)
         {
             m_JoystickPanel.SetActive(m_ForceShowInEditor);
@@ -36,18 +36,38 @@ public class JoystickPlatformTester : MonoBehaviour
             return;
         }
 
-        // 2. If running on a physical Mobile/Tablet device
-        // This handles Native Apps (Android/iOS) AND WebGL running on mobile browsers
-        if (Application.isMobilePlatform)
+        bool showJoystick;
+
+        // 2. Running as WebGL build -> ask the browser directly via jslib plugin.
+        //    Application.isMobilePlatform and SystemInfo.deviceType are unreliable here.
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
         {
-            m_JoystickPanel.SetActive(true);
-            Debug.Log("[JoystickPlatformTester] Mobile platform detected (Native or WebGL Mobile) -> SHOW Joystick.");
+            bool isMobileBrowser = WebGLDeviceDetector.IsMobile();
+
+            if (isMobileBrowser)
+            {
+                showJoystick = true;
+                Debug.Log("[JoystickPlatformTester] WebGL Mobile browser detected -> SHOW Joystick.");
+            }
+            else
+            {
+                showJoystick = false;
+                Debug.Log("[JoystickPlatformTester] WebGL PC/Desktop browser detected -> HIDE Joystick.");
+            }
         }
-        // 3. If running on PC/Console desktop environments (Windows, Mac, Linux, WebGL PC)
+        // 3. Native mobile build (Android/iOS, not WebGL)
+        else if (Application.isMobilePlatform)
+        {
+            showJoystick = true;
+            Debug.Log("[JoystickPlatformTester] Native Mobile platform detected -> SHOW Joystick.");
+        }
+        // 4. Native desktop/console build (Windows, Mac, Linux, consoles)
         else
         {
-            m_JoystickPanel.SetActive(false);
-            Debug.Log("[JoystickPlatformTester] Desktop platform detected (PC/Console or WebGL PC) -> HIDE Joystick.");
+            showJoystick = false;
+            Debug.Log("[JoystickPlatformTester] Native Desktop/Console platform detected -> HIDE Joystick.");
         }
+
+        m_JoystickPanel.SetActive(showJoystick);
     }
 }
