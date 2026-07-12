@@ -29,7 +29,7 @@ public class AnimalController : IInitializable, IDisposable
         catch (Exception ex)
         {
             Debug.LogError($"[AnimalController] Critical error processing AddAnimal for {signal.GroupName}: {ex.Message}");
-            m_SignalBus.Fire(new AddAnimalResultSignal(signal.GroupName, false, ex.Message));
+            //m_SignalBus.Fire(new AddAnimalResultSignal(signal.GroupName, false, ex.Message));
         }
     }
 }
