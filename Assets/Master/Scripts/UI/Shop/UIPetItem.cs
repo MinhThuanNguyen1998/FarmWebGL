@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -51,7 +52,8 @@ public class UIPetItem : MonoBehaviour
             }
         }
 
-        bool isSupported = ItemName == "chicken" || ItemName == "cat";
+        bool isSupported = string.Equals(ItemName, "chicken", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(ItemName, "cat", StringComparison.OrdinalIgnoreCase);
         if (m_ActionButton != null) m_ActionButton.gameObject.SetActive(isSupported);
 
         if (isSupported)

@@ -14,14 +14,18 @@ public class UIShopPet : UIShopBase<UIPetItem, UIPetItem.Pool>
 
         if (items == null || items.Count == 0) return;
 
-        var sorted = items.OrderBy(x => x.name, StringComparer.Ordinal).ToList();
+        var filteredAndSorted = items
+        .Where(x => string.Equals(x.name, "chicken", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(x.name, "cat", StringComparison.OrdinalIgnoreCase))
+        .OrderBy(x => x.name, StringComparer.Ordinal)
+        .ToList();
 
-        for (int i = 0; i < sorted.Count; i++)
+        for (int i = 0; i < filteredAndSorted.Count; i++)
         {
             UIPetItem item = m_Pool.Spawn();
             item.transform.SetParent(m_ContentContainer, false);
             item.transform.SetSiblingIndex(i);
-            item.InitAndSetup(sorted[i]);
+            item.InitAndSetup(filteredAndSorted[i]);
             m_ActiveItems.Add(item);
         }
     }
