@@ -20,7 +20,8 @@ public static class ApiConfig
 
     public static string API_ADD_ANIMAL_URL = "https://homagame.com/api/barn/add-animal";
     public static string API_LOAD_ANIMAL_URL = "https://homagame.com/api/barn/load-animal";
-   
+
+    public static string API_REFRESH_TOKEN_URL = "https://api.example.com/api/refresh";
 
     // Auth API
     public static string API_GET_USER_DATA_URL => API_DATA_URL;
@@ -35,6 +36,11 @@ public static class ApiConfig
     // Animal API
     public static string API_POST_ADD_ANIMAL_URL => API_ADD_ANIMAL_URL;
     public static string API_GET_LOAD_ANIMAL_URL => API_LOAD_ANIMAL_URL;
+
+
+    // Refresh Token API
+    public static string API_POST_REFRESH_TOKEN_URL => API_REFRESH_TOKEN_URL;
+
 }
 
 

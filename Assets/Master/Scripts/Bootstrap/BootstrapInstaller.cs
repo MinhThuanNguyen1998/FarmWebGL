@@ -15,10 +15,12 @@ public class BootstrapInstaller : MonoInstaller
         Container.Bind<NetworkService>().AsSingle().NonLazy();
         Container.Bind<InventoryService>().AsSingle().NonLazy();
         Container.Bind<UserDataService>().AsSingle().NonLazy();
+        Container.BindInterfacesTo<SessionManager>().AsSingle().NonLazy();
 
         // Signals
         Container.DeclareSignal <UserDataLoadedSignal>();
         Container.DeclareSignal<InventoryLoadedSignal>();
         Container.DeclareSignal<RewardClaimedSignal>();
+        Container.DeclareSignal<SessionExpiredSignal>();
     }
 }

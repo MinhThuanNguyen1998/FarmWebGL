@@ -26,7 +26,7 @@ public struct LoginFailedSignal
 
 public struct LoginDataErrorSignal { }
 
-
+public struct SessionExpiredSignal { }
 // User data signals
 public struct UserDataLoadedSignal
 {

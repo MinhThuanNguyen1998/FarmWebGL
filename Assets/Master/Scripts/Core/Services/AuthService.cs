@@ -5,7 +5,6 @@ using UnityEngine.Networking;
 using Zenject;
 public class AuthService 
 {
-
     [Inject] private readonly NetworkService m_NetworkService;
 
     [Serializable]
@@ -32,6 +31,7 @@ public class AuthService
     public class LoginDataContent
     {
         public string access_token;
+        public string refresh_token;
         public string token_type;
         public int expires_in;
         public UserData user;
@@ -51,6 +51,12 @@ public class AuthService
         public bool success;
         public string message;
     }
+
+    [Serializable]
+    public class RefreshTokenRequest
+    {
+        public string refresh_token;
+    }
     public async UniTask<AuthResult> LoginAsync(string username, string password)
     {
         try
@@ -61,10 +67,13 @@ public class AuthService
 
             // Server Error
             if (!networkSuccess)
-                return new AuthResult { IsSuccess = false, ErrorMessage = Config.ServerError }; 
+                return new AuthResult { IsSuccess = false, ErrorMessage = Config.ServerError };
             if (response != null && response.status)
             {
-                TokenManager.SaveTokens(response.data?.access_token, "");
+                TokenManager.SaveTokens(
+                    response.data?.access_token,
+                    response.data?.refresh_token ?? string.Empty,
+                    response.data?.expires_in ?? 0);
                 return new AuthResult { IsSuccess = true, Data = response };
             }
 
@@ -78,6 +87,8 @@ public class AuthService
             return new AuthResult { IsSuccess = false, ErrorMessage = Config.ServerError };
         }
     }
+
+    public UniTask<bool> RefreshTokenAsync() => m_NetworkService.RefreshAccessTokenAsync();
     public async UniTask<bool> LogoutAsync()
     {
         bool isSuccess = false;

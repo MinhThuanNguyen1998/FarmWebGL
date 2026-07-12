@@ -34,23 +34,8 @@ public class UIPopupOpener : MonoBehaviour
     public void OnReward(RewardClaimedSignal signal)
     {
         RewardPopupData data = new RewardPopupData();
+        data.content = signal.Message;
 
-        if (signal.IsSuccess)
-        {
-            data.content = Config.RewardSuccess;
-        }
-        else
-        {
-            if (signal.Message == "Network Error")
-            {
-                data.content = Config.RewardFailed;
-            }
-            else
-            {
-                data.content = Config.RewardAlreadyClaimed;
-            }
-        }
-       
         m_PopupManager.ShowPopup(m_NotificationPopup, data);
     }
 

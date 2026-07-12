@@ -2,11 +2,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
+using Zenject;
 
 public class NetworkService
 {
+    [Inject] private readonly SignalBus m_SignalBus;
+
     private UnityWebRequest CreateRequest(string url, string method, object body = null, bool isAuthenticated = true)
     {
         var request = new UnityWebRequest(url, method) { downloadHandler = new DownloadHandlerBuffer() };
@@ -39,22 +43,106 @@ public class NetworkService
         }
         return request;
     }
+    private async UniTask EnsureValidTokenAsync()
+    {
+        if (!TokenManager.HasToken())
+            return;
+
+        if (!TokenManager.IsTokenExpiringSoon(TokenManager.DEFAULT_REFRESH_THRESHOLD_MINUTES))
+            return;
+
+        bool refreshed = await RefreshAccessTokenAsync();
+        if (!refreshed)
+        {
+            HandleSessionExpired();
+        }
+    }
+
+    public async UniTask<bool> RefreshAccessTokenAsync()
+    {
+        string refreshToken = TokenManager.GetRefreshToken();
+        if (string.IsNullOrEmpty(refreshToken))
+            return false;
+
+        try
+        {
+            var requestBody = new AuthService.RefreshTokenRequest { refresh_token = refreshToken };
+            // isAuthenticated: false -> this call itself must not trigger EnsureValidTokenAsync again.
+            var (networkSuccess, response) = await SendPostCoreAsync<AuthService.RefreshTokenRequest, AuthService.TokenResponse>(
+                ApiConfig.API_POST_REFRESH_TOKEN_URL, requestBody, isAuthenticated: false);
+
+            if (networkSuccess && response != null && response.status
+                && response.data != null && !string.IsNullOrEmpty(response.data.access_token))
+            {
+                TokenManager.SaveTokens(
+                    response.data.access_token,
+                    string.IsNullOrEmpty(response.data.refresh_token) ? refreshToken : response.data.refresh_token,
+                    response.data.expires_in);
+                return true;
+            }
+
+            Debug.LogWarning($"[NetworkService] Refresh token failed: {response?.message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[NetworkService] RefreshToken error: {ex.Message}");
+            return false;
+        }
+    }
+
+    private void HandleSessionExpired()
+    {
+        if (!TokenManager.HasToken())
+            return; // already handled
+
+        TokenManager.ClearTokens();
+        m_SignalBus.Fire(new SessionExpiredSignal());
+    }
+
+    private bool IsExplicitStatusFalse<TResponse>(TResponse data, bool defaultWhenUnknown)
+    {
+        if (data == null)
+            return defaultWhenUnknown;
+
+        foreach (var fieldName in new[] { "status", "success" })
+        {
+            FieldInfo field = typeof(TResponse).GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
+            if (field != null && field.FieldType == typeof(bool))
+                return !(bool)field.GetValue(data);
+        }
+
+        return defaultWhenUnknown;
+    }
 
     private async UniTask<(bool success, TResponse data)> SendPostCoreAsync<TRequest, TResponse>(string url, TRequest body, bool isAuthenticated) where TResponse : class
     {
         try
         {
+            if (isAuthenticated)
+                await EnsureValidTokenAsync();
+
             using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body, isAuthenticated);
             try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception */ }
 
             bool isSuccess = request.result == UnityWebRequest.Result.Success;
             bool isProtocolError = request.result == UnityWebRequest.Result.ProtocolError;
 
+            TResponse parsedResponse = null;
             if ((isSuccess || isProtocolError) && !string.IsNullOrEmpty(request.downloadHandler?.text))
             {
-                try { return (true, JsonUtility.FromJson<TResponse>(request.downloadHandler.text)); }
+                try { parsedResponse = JsonUtility.FromJson<TResponse>(request.downloadHandler.text); }
                 catch (Exception e) { Debug.LogError($"Parse error: {e.Message}"); }
             }
+
+            // Session invalid: HTTP 401, confirmed by an explicit status/success = false when available.
+            if (isAuthenticated && request.responseCode == 401 && IsExplicitStatusFalse(parsedResponse, defaultWhenUnknown: true))
+            {
+                HandleSessionExpired();
+            }
+
+            if (parsedResponse != null)
+                return (true, parsedResponse);
 
             LogNetworkError("POST", request);
             return (false, null);
@@ -70,6 +158,8 @@ public class NetworkService
     {
         try
         {
+            await EnsureValidTokenAsync();
+
             using var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
             await request.SendWebRequest().ToUniTask();
 
@@ -77,7 +167,14 @@ public class NetworkService
                 return (LoadDataResult.Success, JsonUtility.FromJson<T>(request.downloadHandler.text));
 
             LogNetworkError("GET", request);
-            return (request.responseCode == 401 ? LoadDataResult.Unauthorized : LoadDataResult.FetchError, null);
+
+            if (request.responseCode == 401)
+            {
+                HandleSessionExpired();
+                return (LoadDataResult.Unauthorized, null);
+            }
+
+            return (LoadDataResult.FetchError, null);
         }
         catch (Exception ex)
         {
@@ -87,10 +184,16 @@ public class NetworkService
     }
 
     //Sends an authenticated POST request and only returns the success status
-    public async UniTask<bool> SendAuthPostStatusAsync<TRequest>(string url, TRequest body) 
+    public async UniTask<bool> SendAuthPostStatusAsync<TRequest>(string url, TRequest body)
     {
+        await EnsureValidTokenAsync();
+
         using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
         try { await request.SendWebRequest().ToUniTask(); } catch { }
+
+        if (request.responseCode == 401)
+            HandleSessionExpired();
+
         return request.result == UnityWebRequest.Result.Success;
     }
 

@@ -15,7 +15,7 @@ public class BootstrapManager : MonoBehaviour
     [Inject] private readonly UserDataService m_UserDataService;
     private void Awake()
     {
-        if (m_IsClearTokensOnStart) TokenManager.ClearTokens();
+        
         
     }
 

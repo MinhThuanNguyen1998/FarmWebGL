@@ -58,7 +58,7 @@ public class UserDataService
     {
         var requestBody = new AddAnimalRequest { animal_name = groupName };
         var (networkSuccess, response) = await m_NetworkService
-            .SendAuthPostAsync<AddAnimalRequest, ApiAddAnimalResponse>(ApiConfig.API_ADD_ANIMAL_URL, requestBody);
+            .SendAuthPostAsync<AddAnimalRequest, ApiAddAnimalResponse>(ApiConfig.API_POST_ADD_ANIMAL_URL, requestBody);
 
         if (networkSuccess && response != null && response.success)
         {

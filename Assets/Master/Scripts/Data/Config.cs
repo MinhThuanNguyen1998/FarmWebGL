@@ -17,11 +17,6 @@ public static class Config
     public static string Bootstrap_Scene = "Bootstrap";
 
 
-    // Reward
-    public static string RewardSuccess = "Reward claimed successfully!";
-    public static string RewardAlreadyClaimed = "Reward has already been\n claimed today";
-    public static string RewardFailed = "Failed to claim reward due to a \nsystem error";
-
 
     // Boss Challenge
     public static string BossChallengeComingSoon = "Coming soon...";
