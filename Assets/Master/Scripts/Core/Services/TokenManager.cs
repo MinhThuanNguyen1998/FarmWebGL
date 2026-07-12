@@ -12,10 +12,7 @@ public static class TokenManager
     // Threshold used to decide when a token is "about to expire" and should be refreshed proactively.
     public const int DEFAULT_REFRESH_THRESHOLD_MINUTES = 5;
 
-    /// <summary>
-    /// Save access + refresh token. expiresIn is the lifetime of the access token in seconds
-    /// (usually taken from the login/refresh API response's "expires_in" field).
-    /// </summary>
+   
     public static void SaveTokens(string accessToken, string refreshToken, int expiresIn = 0)
     {
         PlayerPrefs.SetString(ACCESS_TOKEN_KEY, accessToken ?? string.Empty);
@@ -34,7 +31,6 @@ public static class TokenManager
         PlayerPrefs.Save();
     }
 
-    // Kept for backward compatibility with older call sites that don't provide an expiry.
     public static void SaveTokens(string accessToken, string refreshToken)
     {
         SaveTokens(accessToken, refreshToken, 0);
