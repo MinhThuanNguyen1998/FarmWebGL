@@ -23,14 +23,13 @@ public class AnimalController : IInitializable, IDisposable
     {
         try
         {
-            bool isSuccess = await m_UserDataService.AddAnimalAsync(signal.GroupName);
-            m_SignalBus.Fire(new AddAnimalResultSignal(signal.GroupName, isSuccess));
+            var (isSuccess, message) = await m_UserDataService.AddAnimalAsync(signal.GroupName);
+            m_SignalBus.Fire(new AddAnimalResultSignal(signal.GroupName, isSuccess, message));
         }
         catch (Exception ex)
         {
-
             Debug.LogError($"[AnimalController] Critical error processing AddAnimal for {signal.GroupName}: {ex.Message}");
-            m_SignalBus.Fire(new AddAnimalResultSignal(signal.GroupName, false));
+            m_SignalBus.Fire(new AddAnimalResultSignal(signal.GroupName, false, ex.Message));
         }
     }
 }
