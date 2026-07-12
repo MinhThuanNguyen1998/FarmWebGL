@@ -61,11 +61,13 @@ public struct AddAnimalResultSignal
 {
     public string GroupName;
     public bool IsSuccess;
+    public string Message;
 
-    public AddAnimalResultSignal(string groupName, bool isSuccess)
+    public AddAnimalResultSignal(string groupName, bool isSuccess, string message = "")
     {
         GroupName = groupName;
         IsSuccess = isSuccess;
+        Message = message;
     }
 }
 // Reward signals

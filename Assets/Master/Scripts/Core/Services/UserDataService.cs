@@ -54,15 +54,20 @@ public class UserDataService
         return result;
     }
 
-    public async UniTask<bool> AddAnimalAsync(string groupName)
+    public async UniTask<(bool isSuccess, string message)> AddAnimalAsync(string groupName)
     {
         var requestBody = new AddAnimalRequest { animal_name = groupName };
-        if (await m_NetworkService.SendAuthPostStatusAsync(ApiConfig.API_ADD_ANIMAL_URL, requestBody))
+        var (networkSuccess, response) = await m_NetworkService
+            .SendAuthPostAsync<AddAnimalRequest, ApiAddAnimalResponse>(ApiConfig.API_ADD_ANIMAL_URL, requestBody);
+
+        if (networkSuccess && response != null && response.success)
         {
             Debug.Log($"Successfully added animal: '{groupName}'");
-            return await LoadAnimalAsync();
+            bool loadOk = await LoadAnimalAsync();
+            return (loadOk, response.message);
         }
-        return false;
+
+        return (false, response?.message);
     }
     public async UniTask<bool> LoadAnimalAsync()
     {

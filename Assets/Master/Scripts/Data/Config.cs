@@ -22,9 +22,6 @@ public static class Config
     public static string RewardAlreadyClaimed = "Reward has already been\n claimed today";
     public static string RewardFailed = "Failed to claim reward due to a \nsystem error";
 
-    // Add Animal
-    public static string AddAnimalSuccess = "Animal added successfully";
-    public static string AddAnimalFailed = "Failed to add animal";
 
     // Boss Challenge
     public static string BossChallengeComingSoon = "Coming soon...";

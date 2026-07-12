@@ -57,8 +57,7 @@ public class UIPopupOpener : MonoBehaviour
     public void OnAddAnimalResult(AddAnimalResultSignal signal)
     {
         RewardPopupData data = new RewardPopupData();
-
-        data.content = signal.IsSuccess ? Config.AddAnimalSuccess : Config.AddAnimalFailed;
+        data.content = signal.Message;
 
         m_PopupManager.ShowPopup(m_NotificationPopup, data);
     }

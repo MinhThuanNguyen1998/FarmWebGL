@@ -18,6 +18,12 @@ public class ApiLoadAnimalResponse
     public LoadAnimalContent data;
 }
 [Serializable]
+public class ApiAddAnimalResponse
+{
+    public bool success;
+    public string message;
+}
+[Serializable]
 public class LoadAnimalContent
 {
     public List<FarmAnimal> farm;

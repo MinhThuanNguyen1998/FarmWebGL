@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class UIShopManager : MonoBehaviour
 {
@@ -12,12 +13,13 @@ public class UIShopManager : MonoBehaviour
     [SerializeField] private Button m_OpenShopButton;  
     [SerializeField] private Button m_CloseShopButton;
 
+    [Inject] private SignalBus m_SignalBus;
     private void Start()
     {
         if (m_ShopPanel != null) m_ShopPanel.SetActive(false);
         if (m_OpenShopButton != null) m_OpenShopButton.onClick.AddListener(OpenShop);
         if (m_CloseShopButton != null) m_CloseShopButton.onClick.AddListener(CloseShop);
-
+        m_SignalBus.Subscribe<AddAnimalResultSignal>(OnAddAnimalResult);
     }
 
     public void OpenShop()
@@ -28,10 +30,15 @@ public class UIShopManager : MonoBehaviour
     {
         if (m_ShopPanel != null) m_ShopPanel.SetActive(false);
     }
+    private void OnAddAnimalResult(AddAnimalResultSignal signal)
+    {
+        if (signal.IsSuccess) CloseShop();
+    }
 
     private void OnDestroy()
     {
         if (m_OpenShopButton != null) m_OpenShopButton.onClick.RemoveListener(OpenShop);
         if (m_CloseShopButton != null) m_CloseShopButton.onClick.RemoveListener(CloseShop);
+        m_SignalBus.TryUnsubscribe<AddAnimalResultSignal>(OnAddAnimalResult);
     }
 }
