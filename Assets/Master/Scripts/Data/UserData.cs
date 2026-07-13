@@ -6,21 +6,21 @@ using UnityEngine;
 [Serializable]
 public class ApiUserDataResponse
 {
-    public bool success;
+    public bool status;
     public string message;
     public ApiUserDataContent data;
 }
 [Serializable]
 public class ApiLoadAnimalResponse
 {
-    public bool success;
+    public bool status;
     public string message;
     public LoadAnimalContent data;
 }
 [Serializable]
 public class ApiAddAnimalResponse
 {
-    public bool success;
+    public bool status;
     public string message;
 }
 [Serializable]

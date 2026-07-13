@@ -19,7 +19,7 @@ public class UserDataService
 
         if (result == LoadDataResult.Success && response != null)
         {
-            if (response.success && response.data != null)
+            if (response.status && response.data != null)
             {
                 Data = new UserData
                 {
@@ -60,7 +60,7 @@ public class UserDataService
         var (networkSuccess, response) = await m_NetworkService
             .SendAuthPostAsync<AddAnimalRequest, ApiAddAnimalResponse>(ApiConfig.API_POST_ADD_ANIMAL_URL, requestBody);
 
-        if (networkSuccess && response != null && response.success)
+        if (networkSuccess && response != null && response.status)
         {
             Debug.Log($"Successfully added animal: '{groupName}'");
             bool loadOk = await LoadAnimalAsync();
@@ -73,7 +73,7 @@ public class UserDataService
     {
         var (result, response) = await m_NetworkService.SendGetRequestAsync<ApiLoadAnimalResponse>(ApiConfig.API_GET_LOAD_ANIMAL_URL);
 
-        if (result == LoadDataResult.Success && response != null && response.success)
+        if (result == LoadDataResult.Success && response != null && response.status)
         {
             if (Data == null)
                 Data = new UserData();

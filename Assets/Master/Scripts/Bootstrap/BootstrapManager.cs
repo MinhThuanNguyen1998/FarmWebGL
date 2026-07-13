@@ -8,12 +8,16 @@ using Zenject;
 public class BootstrapManager : MonoBehaviour
 {
     [SerializeField] private bool m_IsClearTokensOnStart = true;
-    private int m_MaxRetryAttempts = 5;
-
+ 
     [Inject] private readonly AuthService m_AuthService;
     [Inject] private readonly SceneLoader m_SceneLoader;
     [Inject] private readonly UserDataService m_UserDataService;
-
+    private void Awake()
+    {
+        
+        
+    }
+ 
     private async void Start()
     {
         if (TokenManager.HasToken())
@@ -29,32 +33,21 @@ public class BootstrapManager : MonoBehaviour
     }
     private async UniTask HandleUserBootstrappingAsync()
     {
-        for (int attempt = 1; attempt <= m_MaxRetryAttempts; attempt++)
+        LoadDataResult result = await m_UserDataService.LoadAllDataAsync();
+ 
+        if (result == LoadDataResult.Success)
         {
-            LoadDataResult result = await m_UserDataService.LoadAllDataAsync();
-
-            if (result == LoadDataResult.Success)
-            {
-                await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
-                return;
-            }
-
-            if (result == LoadDataResult.Unauthorized)
-            {
-                Debug.LogWarning("Session expired. Clearing tokens and redirecting to Login.");
-                await RedirectToLoginAsync();
-                return; 
-            }
-
-            Debug.LogWarning($"Fetch data failed ({attempt}/{m_MaxRetryAttempts}).");
-
-            if (attempt < m_MaxRetryAttempts)
-            {
-                Debug.Log("Waiting for 3 seconds before retrying...");
-                await UniTask.Delay(TimeSpan.FromSeconds(3));
-            }
+            await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
+            return;
         }
-        Debug.LogError($"Fetch data failed after {m_MaxRetryAttempts}.");
+ 
+        if (result == LoadDataResult.Unauthorized)
+        {
+            Debug.LogWarning("Session expired. SessionManager will redirect to Login.");
+            return;
+        }
+ 
+        Debug.LogError($"Fetch data failed: {result}");
         await RedirectToLoginAsync();
     }
     private async UniTask RedirectToLoginAsync()

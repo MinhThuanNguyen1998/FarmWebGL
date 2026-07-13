@@ -48,7 +48,7 @@ public class AuthService
     [Serializable]
     public class LogoutResponse
     {
-        public bool success;
+        public bool status;
         public string message;
     }
 
