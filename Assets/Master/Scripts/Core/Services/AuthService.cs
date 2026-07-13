@@ -88,7 +88,6 @@ public class AuthService
         }
     }
 
-    public UniTask<bool> RefreshTokenAsync() => m_NetworkService.RefreshAccessTokenAsync();
     public async UniTask<bool> LogoutAsync()
     {
         bool isSuccess = false;
@@ -107,5 +106,6 @@ public class AuthService
 
         return isSuccess;
     }
+
 }
 

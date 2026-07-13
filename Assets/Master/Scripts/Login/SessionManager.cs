@@ -3,11 +3,6 @@ using System;
 using UnityEngine.SceneManagement;
 using Zenject;
 
-/// <summary>
-/// Listens for SessionExpiredSignal (fired by NetworkService when the access token is
-/// rejected with 401 and cannot be refreshed) and sends the player back to the login scene.
-/// The token itself is already cleared by NetworkService before this signal is fired.
-/// </summary>
 public class SessionManager : IInitializable, IDisposable
 {
     [Inject] private readonly SignalBus m_SignalBus;

@@ -9,10 +9,6 @@ public static class TokenManager
     private const string REFRESH_TOKEN_KEY = "Refresh_Token";
     private const string EXPIRY_TIME_KEY = "Access_Token_Expiry"; // UTC ticks, stored as string
 
-    // Threshold used to decide when a token is "about to expire" and should be refreshed proactively.
-    public const int DEFAULT_REFRESH_THRESHOLD_MINUTES = 5;
-
-   
     public static void SaveTokens(string accessToken, string refreshToken, int expiresIn = 0)
     {
         PlayerPrefs.SetString(ACCESS_TOKEN_KEY, accessToken ?? string.Empty);
@@ -31,47 +27,14 @@ public static class TokenManager
         PlayerPrefs.Save();
     }
 
-    public static void SaveTokens(string accessToken, string refreshToken)
-    {
-        SaveTokens(accessToken, refreshToken, 0);
-    }
-
     public static string GetAccessToken()
     {
         return PlayerPrefs.GetString(ACCESS_TOKEN_KEY, string.Empty);
     }
-    public static string GetRefreshToken()
-    {
-        return PlayerPrefs.GetString(REFRESH_TOKEN_KEY, string.Empty);
-    }
+
     public static bool HasToken()
     {
         return !string.IsNullOrEmpty(GetAccessToken());
-    }
-    public static bool HasRefreshToken()
-    {
-        return !string.IsNullOrEmpty(GetRefreshToken());
-    }
-
-    public static DateTime GetAccessTokenExpiryUtc()
-    {
-        string raw = PlayerPrefs.GetString(EXPIRY_TIME_KEY, string.Empty);
-        if (string.IsNullOrEmpty(raw) || !long.TryParse(raw, out long ticks))
-            return DateTime.MinValue;
-
-        return new DateTime(ticks, DateTimeKind.Utc);
-    }
-
-    public static bool IsTokenExpiringSoon(int thresholdMinutes = DEFAULT_REFRESH_THRESHOLD_MINUTES)
-    {
-        if (!HasToken())
-            return false;
-
-        DateTime expiryUtc = GetAccessTokenExpiryUtc();
-        if (expiryUtc == DateTime.MinValue)
-            return false;
-
-        return DateTime.UtcNow >= expiryUtc.AddMinutes(-thresholdMinutes);
     }
 
     public static void ClearTokens()

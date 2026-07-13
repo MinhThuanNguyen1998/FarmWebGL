@@ -13,11 +13,6 @@ public class BootstrapManager : MonoBehaviour
     [Inject] private readonly AuthService m_AuthService;
     [Inject] private readonly SceneLoader m_SceneLoader;
     [Inject] private readonly UserDataService m_UserDataService;
-    private void Awake()
-    {
-        
-        
-    }
 
     private async void Start()
     {
