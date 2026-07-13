@@ -10,6 +10,7 @@ public class LogOutController : IInitializable, IDisposable
     [Inject] private readonly SignalBus m_SignalBus;
     [Inject] private readonly AuthService m_AuthService;
     [Inject] private readonly SceneLoader m_SceneLoader;
+    [Inject] private readonly UserDataService m_UserDataService;
     public void Initialize() => m_SignalBus.Subscribe<LogoutConfirmedSignal>(HandleLogoutConfirmed);
     public void Dispose() => m_SignalBus.Unsubscribe<LogoutConfirmedSignal>(HandleLogoutConfirmed);
 
@@ -23,6 +24,7 @@ public class LogOutController : IInitializable, IDisposable
         try
         {
             await m_AuthService.LogoutAsync();
+            m_UserDataService.ResetData();
             await m_SceneLoader.LoadSceneWithLoadingBar(Config.Login_Scene);
         }
         catch (Exception ex)

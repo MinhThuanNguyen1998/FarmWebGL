@@ -7,6 +7,7 @@ public class SessionManager : IInitializable, IDisposable
 {
     [Inject] private readonly SignalBus m_SignalBus;
     [Inject] private readonly SceneLoader m_SceneLoader;
+    [Inject] private readonly UserDataService m_UserDataService;
 
     private bool m_IsHandling;
 
@@ -17,6 +18,8 @@ public class SessionManager : IInitializable, IDisposable
     {
         if (m_IsHandling)
             return;
+
+        m_UserDataService.ResetData();
 
         // Already on the login screen (e.g. token expired while loading initial user data) - nothing to do.
         if (SceneManager.GetActiveScene().name == Config.Login_Scene)
