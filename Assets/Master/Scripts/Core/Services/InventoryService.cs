@@ -7,7 +7,7 @@ using Zenject;
 public class InventoryService 
 {
     public bool IsLoaded { get; private set; }
-   
+
     public List<InventoryItem> Items { get; private set; } = new List<InventoryItem>();
 
     [Inject] private readonly NetworkService m_NetworkService;
@@ -27,12 +27,18 @@ public class InventoryService
                 IsLoaded = true;
 
                 Debug.Log($"[InventoryService] Loaded {Items.Count} types of items.");
+
+                m_SignalBus.Fire(new InventoryLoadedSignal(Items));
             }
             else
             {
-                Debug.LogError("[InventoryService] API status=false orr data is null.");
+                Debug.LogError("[InventoryService] API status = false orr data is null.");
                 return LoadDataResult.FetchError;
             }
+        }
+        else
+        {
+            Debug.LogWarning($"[InventoryService] Failed to load inventory (API_GET_INVENTORY_URL). Result: {result}");
         }
         return result;
     }

@@ -40,17 +40,6 @@ public class UserDataService
             return result;
         }
 
-        // Load inventory
-        var inventoryResult = await m_InventoryService.LoadInventoryAsync();
-        if (inventoryResult == LoadDataResult.Success)
-        {
-            m_SignalBus.Fire(new InventoryLoadedSignal(m_InventoryService.Items));
-        }
-        else
-        {
-            Debug.LogWarning($"[UserDataService] Inventory load failed: {inventoryResult}");
-        }
-
         return result;
     }
 
