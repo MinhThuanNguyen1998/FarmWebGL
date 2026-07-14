@@ -33,8 +33,10 @@ public class UIUserInfor : MonoBehaviour
         {
             //string rawMoney = signal.Data.total_amount_user; 
             //m_TextMoney.text = MoneyFormatter.ParseAndFormat(rawMoney);
+            Debug.Log("Reward claimed :" + m_UserDataService.Data.money);
             UpdateUserInfor(m_UserDataService.Data);
         }
+        
     }
     private void UpdateUserInfor(UserData data)
     {

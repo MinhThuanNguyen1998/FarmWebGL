@@ -11,8 +11,6 @@ public class NetworkService
 {
     [Inject] private readonly SignalBus m_SignalBus;
 
-    // Minimal shape used only to detect an "Unauthenticated" response as shown by the API:
-    // { "status": false, "code": 401, "message": "Unauthenticated" }
     [Serializable]
     private class ApiStatusResponse
     {
@@ -57,20 +55,17 @@ public class NetworkService
     private void HandleSessionExpired()
     {
         if (!TokenManager.HasToken())
-            return; // already handled
+            return;
 
         TokenManager.ClearTokens();
         m_SignalBus.Fire(new SessionExpiredSignal());
     }
 
-    /// <summary>
-    /// True if this request should be treated as "session expired": either the
-    /// HTTP status itself is 401, or the server answered 200 with a body that
-    /// flags { status:false, code:401 }. Any 401, in any shape, clears the
-    /// token and kicks the SessionExpiredSignal so the app returns to Login.
-    /// </summary>
     private bool CheckAndHandleUnauthenticated(UnityWebRequest request, string responseText)
     {
+        if (request == null)
+            return false;
+
         if (request.responseCode == 401)
         {
             HandleSessionExpired();
@@ -95,25 +90,41 @@ public class NetworkService
 
     private async UniTask<(bool success, TResponse data)> SendPostCoreAsync<TRequest, TResponse>(string url, TRequest body, bool isAuthenticated) where TResponse : class
     {
+        var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body, isAuthenticated);
         try
         {
-            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body, isAuthenticated);
-            try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception */ }
+            // WebGL an toàn hơn khi không dùng SuppressCancellationThrow bọc ngoài luồng chính nếu đã có try-catch
+            await request.SendWebRequest().ToUniTask(progress: null, timing: PlayerLoopTiming.Update).SuppressCancellationThrow();
+
+            if (isAuthenticated && request.responseCode == 401)
+            {
+                HandleSessionExpired();
+                return (false, null);
+            }
+
+            string responseText = string.Empty;
+            if (request.downloadHandler != null)
+            {
+                try { responseText = request.downloadHandler.text; } catch { }
+            }
+
+            if (isAuthenticated && CheckAndHandleUnauthenticated(request, responseText))
+                return (false, null);
 
             bool isSuccess = request.result == UnityWebRequest.Result.Success;
             bool isProtocolError = request.result == UnityWebRequest.Result.ProtocolError;
 
-            string responseText = request.downloadHandler?.text;
-
-            // 401 (HTTP status or body flag) -> clear token and go to login.
-            if (isAuthenticated && CheckAndHandleUnauthenticated(request, responseText))
-                return (false, null);
-
             TResponse parsedResponse = null;
             if ((isSuccess || isProtocolError) && !string.IsNullOrEmpty(responseText))
             {
-                try { parsedResponse = JsonUtility.FromJson<TResponse>(responseText); }
-                catch (Exception e) { Debug.LogError($"Parse error: {e.Message}"); }
+                try
+                {
+                    parsedResponse = JsonUtility.FromJson<TResponse>(responseText);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[WebGL Network] Parse POST response JSON error: {e.Message}");
+                }
             }
 
             if (parsedResponse != null)
@@ -122,41 +133,70 @@ public class NetworkService
             LogNetworkError("POST", request);
             return (false, null);
         }
+        catch (OperationCanceledException)
+        {
+            Debug.LogWarning("POST Request was canceled.");
+            return (false, null);
+        }
         catch (Exception ex)
         {
             Debug.LogError($"System error during POST: {ex.Message}");
             return (false, null);
         }
+        finally
+        {
+            request?.Dispose();
+        }
     }
 
     public async UniTask<(LoadDataResult status, T responseData)> SendGetRequestAsync<T>(string url) where T : class
     {
+        var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
         try
         {
-            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
-            try
+            await request.SendWebRequest().ToUniTask(progress: null, timing: PlayerLoopTiming.Update).SuppressCancellationThrow();
+
+            if (request.responseCode == 401)
             {
-                await request.SendWebRequest().ToUniTask();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"Request aborted or failed: {ex.Message}");
+                HandleSessionExpired();
+                return (LoadDataResult.Unauthorized, null);
             }
 
-            if (request.result == UnityWebRequest.Result.ConnectionError)
+            string responseText = string.Empty;
+            if (request.downloadHandler != null)
             {
-                return (LoadDataResult.FetchError, null);
+                try { responseText = request.downloadHandler.text; } catch { }
             }
-
-            string responseText = request.downloadHandler?.text;
 
             if (CheckAndHandleUnauthenticated(request, responseText))
                 return (LoadDataResult.Unauthorized, null);
 
             if (request.result == UnityWebRequest.Result.Success)
-                return (LoadDataResult.Success, JsonUtility.FromJson<T>(responseText));
+            {
+                if (string.IsNullOrEmpty(responseText))
+                {
+                    Debug.LogWarning("[WebGL Network] GET Response body is empty.");
+                    return (LoadDataResult.FetchError, null);
+                }
+
+                try
+                {
+                    T parsed = JsonUtility.FromJson<T>(responseText);
+                    return (LoadDataResult.Success, parsed);
+                }
+                catch (Exception jsonEx)
+                {
+                    Debug.LogError($"[WebGL Network] GET Parse JSON failed: {jsonEx.Message}");
+                    return (LoadDataResult.FetchError, null);
+                }
+            }
 
             LogNetworkError("GET", request);
+            return (LoadDataResult.FetchError, null);
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.LogWarning("GET Request was canceled.");
             return (LoadDataResult.FetchError, null);
         }
         catch (Exception ex)
@@ -164,38 +204,59 @@ public class NetworkService
             Debug.LogError($"System error during GET: {ex.Message}");
             return (LoadDataResult.FetchError, null);
         }
+        finally
+        {
+            request?.Dispose();
+        }
     }
 
-    //Sends an authenticated POST request and only returns the success status
     public async UniTask<bool> SendAuthPostStatusAsync<TRequest>(string url, TRequest body)
     {
+        var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
         try
         {
-            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
-            try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception */ }
+            await request.SendWebRequest().ToUniTask(progress: null, timing: PlayerLoopTiming.Update).SuppressCancellationThrow();
 
-            // 401 (HTTP status or body flag) -> clear token and go to login.
-            CheckAndHandleUnauthenticated(request, request.downloadHandler?.text);
+            if (request.responseCode == 401)
+            {
+                HandleSessionExpired();
+                return false;
+            }
+
+            string responseText = string.Empty;
+            if (request.downloadHandler != null)
+            {
+                try { responseText = request.downloadHandler.text; } catch { }
+            }
+
+            CheckAndHandleUnauthenticated(request, responseText);
 
             return request.result == UnityWebRequest.Result.Success;
         }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
         catch (Exception ex)
         {
-            Debug.LogError($"System error during POST: {ex.Message}");
+            Debug.LogError($"System error during POST Status: {ex.Message}");
             return false;
+        }
+        finally
+        {
+            request?.Dispose();
         }
     }
 
-    // Sends a POST request with Token
     public UniTask<(bool networkSuccess, TResponse responseData)> SendAuthPostAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
         => SendPostCoreAsync<TRequest, TResponse>(url, body, isAuthenticated: true);
 
-    //Sends a POST request WITHOUT Token
     public UniTask<(bool networkSuccess, TResponse responseData)> SendPostAsync<TRequest, TResponse>(string url, TRequest body) where TResponse : class
         => SendPostCoreAsync<TRequest, TResponse>(url, body, isAuthenticated: false);
 
     private void LogNetworkError(string method, UnityWebRequest request)
     {
+        if (request == null) return;
         if (request.responseCode == 401) Debug.LogWarning("Token expired (401 Unauthorized).");
         else Debug.LogError($"API {method} Error: {request.error} (Code: {request.responseCode})");
     }

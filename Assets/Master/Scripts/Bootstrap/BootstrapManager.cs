@@ -10,14 +10,13 @@ public class BootstrapManager : MonoBehaviour
 
     [Header("Debug / Testing")]
     [SerializeField] private bool m_IsClearTokensOnStart = false;
-
     [SerializeField] private bool m_DebugForceInvalidToken = false;
 
     [Inject] private readonly AuthService m_AuthService;
     [Inject] private readonly SceneLoader m_SceneLoader;
     [Inject] private readonly UserDataService m_UserDataService;
- 
-    private async void Start()
+
+    private void Start()
     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (m_IsClearTokensOnStart)
@@ -32,39 +31,65 @@ public class BootstrapManager : MonoBehaviour
         }
 #endif
 
-        if (TokenManager.HasToken())
+        // Chạy khởi động game một cách an toàn và quản lý luồng bằng CancellationToken
+        StartBootstrappingAsync().Forget();
+    }
+
+    private async UniTaskVoid StartBootstrappingAsync()
+    {
+        try
         {
-            Debug.Log("Token found in PlayerPrefs. Trying to load data...");
-            await HandleUserBootstrappingAsync();
+            if (TokenManager.HasToken())
+            {
+                Debug.Log("Token found in PlayerPrefs. Trying to load data...");
+                await HandleUserBootstrappingAsync();
+            }
+            else
+            {
+                Debug.Log("No token found. Redirecting to Login scene.");
+                await m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene)
+                    .AttachExternalCancellation(this.destroyCancellationToken); // Tự hủy nếu đổi cảnh
+            }
         }
-        else
+        catch (OperationCanceledException)
         {
-            Debug.Log("No token found. Redirecting to Login scene.");
-            await m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene);
+            // Bắt lỗi hủy tác vụ một cách chủ động khi chuyển cảnh, tránh crash WebGL
+            Debug.Log("[BootstrapManager] Bootstrap task was cancelled safely.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[BootstrapManager] Error during bootstrap: {ex.Message}");
         }
     }
+
     private async UniTask HandleUserBootstrappingAsync()
     {
-        LoadDataResult result = await m_UserDataService.LoadAllDataAsync();
+        // Truyền CancellationToken vào để nếu bị đổi cảnh trong lúc đang tải dữ liệu, request sẽ dừng ngay lập tức
+        LoadDataResult result = await m_UserDataService.LoadAllDataAsync()
+            .AttachExternalCancellation(this.destroyCancellationToken);
 
         if (result == LoadDataResult.Success)
         {
-            await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene);
+            await m_SceneLoader.LoadSceneWithLoadingBar(Config.Main_Scene)
+                .AttachExternalCancellation(this.destroyCancellationToken);
             return;
         }
 
         if (result == LoadDataResult.Unauthorized)
         {
             Debug.LogWarning("Session expired. SessionManager will redirect to Login.");
+            // Kết thúc hàm ở đây, không gọi bất kỳ tác vụ nào khác vì SessionManager đang xử lý chuyển cảnh
             return;
         }
 
         Debug.LogError($"Fetch data failed: {result}");
         await RedirectToLoginAsync();
     }
+
     private async UniTask RedirectToLoginAsync()
     {
         TokenManager.ClearTokens();
-        await m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene);
+        await m_SceneLoader.LoadSceneWithoutLoadingBar(Config.Login_Scene)
+            .AttachExternalCancellation(this.destroyCancellationToken);
     }
 }

@@ -23,27 +23,28 @@ public class SessionManager : IInitializable, IDisposable
         m_IsHandling = true;
         m_UserDataService.ResetData();
 
+   
         if (SceneManager.GetActiveScene().name == Config.Login_Scene)
         {
             m_IsHandling = false;
             return;
         }
 
-        GoToLoginAsync().Forget();
+        GoToLoginWithDelayAsync().Forget();
     }
 
-    private async UniTaskVoid GoToLoginAsync()
+    private async UniTaskVoid GoToLoginWithDelayAsync()
     {
         try
         {
             await UniTask.Yield(PlayerLoopTiming.Update);
-
-            Debug.Log("Session expired. Redirecting to login scene...");
+            await UniTask.Delay(100);
+            Debug.Log("[SessionManager] Safe redirecting to login scene...");
             await m_SceneLoader.LoadSceneWithLoadingBar(Config.Login_Scene);
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Error redirecting to login: {ex.Message}");
+            Debug.LogError($"[SessionManager] Error during redirect: {ex.Message}");
         }
         finally
         {
