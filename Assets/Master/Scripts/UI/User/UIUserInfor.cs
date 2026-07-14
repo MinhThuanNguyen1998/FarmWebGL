@@ -31,12 +31,9 @@ public class UIUserInfor : MonoBehaviour
     {
         if (signal.IsSuccess && signal.Data != null)
         {
-            
-            if (signal.Data is RewardData rewardData)
-            {
-                string rawMoney = rewardData.total_amount_user;
-                m_TextMoney.text = MoneyFormatter.ParseAndFormat(rawMoney);
-            }
+            //string rawMoney = signal.Data.total_amount_user; 
+            //m_TextMoney.text = MoneyFormatter.ParseAndFormat(rawMoney);
+            UpdateUserInfor(m_UserDataService.Data);
         }
     }
     private void UpdateUserInfor(UserData data)

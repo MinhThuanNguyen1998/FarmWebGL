@@ -75,9 +75,9 @@ public class RewardClaimedSignal
 {
     public bool IsSuccess { get; }
     public string Message { get; }
-    public object Data { get; }
+    public RewardData Data { get; }
 
-    public RewardClaimedSignal(bool isSuccess, string message = "", object data = null)
+    public RewardClaimedSignal(bool isSuccess, string message = "", RewardData data = null)
     {
         IsSuccess = isSuccess;
         Message = message;
