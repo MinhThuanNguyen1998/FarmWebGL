@@ -63,8 +63,14 @@ public class NetworkService
         m_SignalBus.Fire(new SessionExpiredSignal());
     }
 
-    private bool CheckAndHandleUnauthenticated(string responseText)
+    private bool CheckAndHandleUnauthenticated(UnityWebRequest request, string responseText)
     {
+        if (request.responseCode == 401)
+        {
+            HandleSessionExpired();
+            return true;
+        }
+
         if (string.IsNullOrEmpty(responseText))
             return false;
 
@@ -93,8 +99,8 @@ public class NetworkService
 
             string responseText = request.downloadHandler?.text;
 
-            // status = false, code = 401 -> clear token and go to login.
-            if (isAuthenticated && CheckAndHandleUnauthenticated(responseText))
+            // 401 (HTTP status or body flag) -> clear token and go to login.
+            if (isAuthenticated && CheckAndHandleUnauthenticated(request, responseText))
                 return (false, null);
 
             TResponse parsedResponse = null;
@@ -126,8 +132,8 @@ public class NetworkService
 
             string responseText = request.downloadHandler?.text;
 
-            // status = false, code = 401 -> clear token and go to login.
-            if (CheckAndHandleUnauthenticated(responseText))
+            // 401 (HTTP status or body flag) -> clear token and go to login.
+            if (CheckAndHandleUnauthenticated(request, responseText))
                 return (LoadDataResult.Unauthorized, null);
 
             if (request.result == UnityWebRequest.Result.Success)
@@ -149,8 +155,8 @@ public class NetworkService
         using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
         try { await request.SendWebRequest().ToUniTask(); } catch { }
 
-        // status = false, code = 401 -> clear token and go to login.
-        CheckAndHandleUnauthenticated(request.downloadHandler?.text);
+        // 401 (HTTP status or body flag) -> clear token and go to login.
+        CheckAndHandleUnauthenticated(request, request.downloadHandler?.text);
 
         return request.result == UnityWebRequest.Result.Success;
     }

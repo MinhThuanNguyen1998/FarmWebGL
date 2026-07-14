@@ -7,16 +7,10 @@ using UnityEngine;
 using Zenject;
 public class BootstrapManager : MonoBehaviour
 {
-    [SerializeField] private bool m_IsClearTokensOnStart = true;
  
     [Inject] private readonly AuthService m_AuthService;
     [Inject] private readonly SceneLoader m_SceneLoader;
     [Inject] private readonly UserDataService m_UserDataService;
-    private void Awake()
-    {
-        
-        
-    }
  
     private async void Start()
     {
