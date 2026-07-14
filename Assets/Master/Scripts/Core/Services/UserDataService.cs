@@ -95,7 +95,7 @@ public class UserDataService
                 {
                     Data.userInfo.amount = response.data.total_amount_user;
                 }
-                m_SignalBus.Fire(new RewardClaimedSignal(true, "Success", response.data));
+                m_SignalBus.Fire(new RewardClaimedSignal(true, response.message, response.data));
                 return true;
             }
         }
