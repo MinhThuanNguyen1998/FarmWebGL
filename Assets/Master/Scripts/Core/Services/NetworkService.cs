@@ -158,13 +158,21 @@ public class NetworkService
     //Sends an authenticated POST request and only returns the success status
     public async UniTask<bool> SendAuthPostStatusAsync<TRequest>(string url, TRequest body)
     {
-        using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
-        try { await request.SendWebRequest().ToUniTask(); } catch { }
+        try
+        {
+            using var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
+            try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception */ }
 
-        // 401 (HTTP status or body flag) -> clear token and go to login.
-        CheckAndHandleUnauthenticated(request, request.downloadHandler?.text);
+            // 401 (HTTP status or body flag) -> clear token and go to login.
+            CheckAndHandleUnauthenticated(request, request.downloadHandler?.text);
 
-        return request.result == UnityWebRequest.Result.Success;
+            return request.result == UnityWebRequest.Result.Success;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"System error during POST: {ex.Message}");
+            return false;
+        }
     }
 
     // Sends a POST request with Token
