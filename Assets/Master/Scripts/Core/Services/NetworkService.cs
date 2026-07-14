@@ -63,6 +63,12 @@ public class NetworkService
         m_SignalBus.Fire(new SessionExpiredSignal());
     }
 
+    /// <summary>
+    /// True if this request should be treated as "session expired": either the
+    /// HTTP status itself is 401, or the server answered 200 with a body that
+    /// flags { status:false, code:401 }. Any 401, in any shape, clears the
+    /// token and kicks the SessionExpiredSignal so the app returns to Login.
+    /// </summary>
     private bool CheckAndHandleUnauthenticated(UnityWebRequest request, string responseText)
     {
         if (request.responseCode == 401)
@@ -128,7 +134,7 @@ public class NetworkService
         try
         {
             using var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
-            await request.SendWebRequest().ToUniTask();
+            try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception, handled via request.result below */ }
 
             string responseText = request.downloadHandler?.text;
 
