@@ -1,5 +1,6 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
 
@@ -19,13 +20,15 @@ public class SessionManager : IInitializable, IDisposable
         if (m_IsHandling)
             return;
 
+        m_IsHandling = true;
         m_UserDataService.ResetData();
 
-        // Already on the login screen (e.g. token expired while loading initial user data) - nothing to do.
         if (SceneManager.GetActiveScene().name == Config.Login_Scene)
+        {
+            m_IsHandling = false;
             return;
+        }
 
-        m_IsHandling = true;
         GoToLoginAsync().Forget();
     }
 
@@ -33,7 +36,14 @@ public class SessionManager : IInitializable, IDisposable
     {
         try
         {
+            await UniTask.Yield(PlayerLoopTiming.Update);
+
+            Debug.Log("Session expired. Redirecting to login scene...");
             await m_SceneLoader.LoadSceneWithLoadingBar(Config.Login_Scene);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error redirecting to login: {ex.Message}");
         }
         finally
         {

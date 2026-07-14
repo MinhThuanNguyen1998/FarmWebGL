@@ -134,11 +134,22 @@ public class NetworkService
         try
         {
             using var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
-            try { await request.SendWebRequest().ToUniTask(); } catch { /* Ignore network abort exception, handled via request.result below */ }
+            try
+            {
+                await request.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"Request aborted or failed: {ex.Message}");
+            }
+
+            if (request.result == UnityWebRequest.Result.ConnectionError)
+            {
+                return (LoadDataResult.FetchError, null);
+            }
 
             string responseText = request.downloadHandler?.text;
 
-            // 401 (HTTP status or body flag) -> clear token and go to login.
             if (CheckAndHandleUnauthenticated(request, responseText))
                 return (LoadDataResult.Unauthorized, null);
 
