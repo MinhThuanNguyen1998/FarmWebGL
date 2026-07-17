@@ -76,8 +76,14 @@ public class NetworkService
             return false;
 
         ApiStatusResponse parsed;
-        try { parsed = JsonUtility.FromJson<ApiStatusResponse>(responseText); }
-        catch { return false; }
+        try
+        {
+            parsed = JsonUtility.FromJson<ApiStatusResponse>(responseText);
+        }
+        catch
+        {
+            return false;
+        }
 
         if (parsed != null && !parsed.status && parsed.code == 401)
         {
@@ -93,8 +99,12 @@ public class NetworkService
         var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body, isAuthenticated);
         try
         {
-            // WebGL an toàn hơn khi không dùng SuppressCancellationThrow bọc ngoài luồng chính nếu đã có try-catch
-            await request.SendWebRequest().ToUniTask(progress: null, timing: PlayerLoopTiming.Update).SuppressCancellationThrow();
+            
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
 
             if (isAuthenticated && request.responseCode == 401)
             {
@@ -105,7 +115,7 @@ public class NetworkService
             string responseText = string.Empty;
             if (request.downloadHandler != null)
             {
-                try { responseText = request.downloadHandler.text; } catch { }
+                responseText = request.downloadHandler.text;
             }
 
             if (isAuthenticated && CheckAndHandleUnauthenticated(request, responseText))
@@ -140,6 +150,7 @@ public class NetworkService
         }
         catch (Exception ex)
         {
+            /
             Debug.LogError($"System error during POST: {ex.Message}");
             return (false, null);
         }
@@ -154,7 +165,12 @@ public class NetworkService
         var request = CreateRequest(url, UnityWebRequest.kHttpVerbGET);
         try
         {
-            await request.SendWebRequest().ToUniTask(progress: null, timing: PlayerLoopTiming.Update).SuppressCancellationThrow();
+            
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
 
             if (request.responseCode == 401)
             {
@@ -165,7 +181,7 @@ public class NetworkService
             string responseText = string.Empty;
             if (request.downloadHandler != null)
             {
-                try { responseText = request.downloadHandler.text; } catch { }
+                responseText = request.downloadHandler.text;
             }
 
             if (CheckAndHandleUnauthenticated(request, responseText))
@@ -215,7 +231,11 @@ public class NetworkService
         var request = CreateRequest(url, UnityWebRequest.kHttpVerbPOST, body);
         try
         {
-            await request.SendWebRequest().ToUniTask(progress: null, timing: PlayerLoopTiming.Update).SuppressCancellationThrow();
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
 
             if (request.responseCode == 401)
             {
@@ -226,7 +246,7 @@ public class NetworkService
             string responseText = string.Empty;
             if (request.downloadHandler != null)
             {
-                try { responseText = request.downloadHandler.text; } catch { }
+                responseText = request.downloadHandler.text;
             }
 
             CheckAndHandleUnauthenticated(request, responseText);
